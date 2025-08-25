@@ -53,7 +53,7 @@ export default async function searchCommerceAppBuilderDocs(args) {
     // Get the Cloudflare Worker URL from environment or use default
     const workerUrl =
       process.env.CLOUDFLARE_WORKER_URL ||
-      "https://app-builder-commerce-docs-embed.apimesh-adobe-test.workers.dev";
+      "https://commerce-documentation-rag-service.apimesh-adobe-test.workers.dev";
 
     // Make the request to the Cloudflare Worker
     const response = await fetch(`${workerUrl}/query`, {
