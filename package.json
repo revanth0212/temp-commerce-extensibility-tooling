@@ -1,11 +1,11 @@
 {
-  "name": "adobe-io-tools-mcp-server",
+  "name": "temp-commerce-extensibility-tooling",
   "version": "1.0.0",
-  "description": "MCP server providing Adobe I/O CLI tools for deployment and management",
+  "description": "MCP server providing Temp Commerce Extensibility Tooling for deployment and management",
   "main": "index.js",
   "type": "module",
   "bin": {
-    "adobe-io-tools-mcp-server": "./index.js"
+    "temp-commerce-extensibility-tooling": "./index.js"
   },
   "scripts": {
     "start": "node index.js",
