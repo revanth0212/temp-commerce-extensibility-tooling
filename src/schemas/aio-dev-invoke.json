@@ -1,0 +1,39 @@
+{
+  "name": "aio-dev-invoke",
+  "description": "Invoke a runtime action that is running locally via aio app dev. Can discover available actions and call them with parameters.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "actionName": {
+        "type": "string",
+        "description": "Name of the action to invoke (e.g., \"starter-kit/info\"). Required unless discoverActions is true."
+      },
+      "parameters": {
+        "type": "object",
+        "description": "JSON object of parameters to pass to the action (optional)"
+      },
+      "method": {
+        "type": "string",
+        "description": "HTTP method to use (GET, POST, PUT, etc.). Default: POST",
+        "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        "default": "POST"
+      },
+      "port": {
+        "type": "integer",
+        "description": "Port number where the dev server is running (optional, default: 9080)",
+        "default": 9080
+      },
+      "discoverActions": {
+        "type": "boolean",
+        "description": "Discover available actions by testing common action names (optional, default: false)",
+        "default": false
+      },
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output (optional, default: false)",
+        "default": false
+      }
+    },
+    "required": []
+  }
+} 

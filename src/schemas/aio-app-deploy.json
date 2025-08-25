@@ -1,0 +1,44 @@
+{
+  "name": "aio-app-deploy",
+  "description": "Deploy an Adobe I/O App to runtime. Can deploy specific actions or the entire app.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "Specific action name to deploy (optional). Format: packageName/actionName. If not provided, deploys the entire app. This will automatically set --no-publish flag."
+      },
+      "skipBuild": {
+        "type": "boolean",
+        "description": "Skip the build phase using --no-build (optional, default: false)",
+        "default": false
+      },
+      "skipStatic": {
+        "type": "boolean",
+        "description": "Skip deployment of web assets using --no-web-assets (optional, default: false)",
+        "default": false
+      },
+      "skipActions": {
+        "type": "boolean",
+        "description": "Skip deployment of actions using --no-actions (optional, default: false)",
+        "default": false
+      },
+      "forceBuild": {
+        "type": "boolean",
+        "description": "Force build even if no changes detected using --force-build (optional, default: false)",
+        "default": false
+      },
+      "forceDeploy": {
+        "type": "boolean",
+        "description": "Force deploy even if no changes detected using --force-deploy (optional, default: false)",
+        "default": false
+      },
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output (optional, default: false)",
+        "default": false
+      }
+    },
+    "required": []
+  }
+} 

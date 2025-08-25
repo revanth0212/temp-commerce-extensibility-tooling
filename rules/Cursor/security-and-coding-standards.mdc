@@ -1,0 +1,245 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - Security & Quality Standards
+
+## Security by Design
+
+All code you generate must adhere to these security principles. They are not optional.
+
+### Application Access Controls
+
+App Builder implements multi-layered access control:
+* **Experience Cloud Organization Membership:** Users must be members of the Experience Cloud org that owns the application
+* **Adobe Application Access:** Users must have access to ALL Adobe applications used by the App Builder extension (e.g., if using Analytics and Campaign APIs, user needs access to both)
+* **IMS Token Validation:** All Adobe API interactions require Adobe IMS bearer tokens passed as Authorization headers
+
+### Authentication Architecture
+
+* **Single Page Applications:** Use Adobe IMS user tokens for user-context-aware applications
+* **Headless Applications:** Use Adobe IMS JWT access tokens (24-hour lifetime) for server-to-server communication
+* **Token Management:** Implement automatic token refresh using IMS SDK libraries to avoid manual daily token updates
+* **IMS Libraries:** Use provided Adobe authentication libraries for seamless credential exchange and token caching
+
+### Input Validation & Parameter Sanitization
+
+You must never trust incoming data. Always generate code that sanitizes and validates all payloads from events or API calls, using the validator.js file in the starter kit. For web actions, be especially cautious with parameters used in system calls, SQL queries, or eval operations. Properly escape special characters (semicolons, ampersands) to prevent command injection.
+
+### Event Security & Webhook Validation
+
+For Commerce event-driven integrations, implement comprehensive security measures:
+
+* **Adobe I/O Event Signature Validation:** Always verify webhook signatures using HMAC-SHA256 with your client secret. Reject requests with invalid or missing signatures immediately
+* **Event Payload Schema Validation:** Use strict JSON schema validation (via Joi or similar) to ensure event payloads match expected structure and data types
+* **Event Source Verification:** Validate that events originate from authorized Commerce instances by checking the event metadata and source identifiers
+* **Replay Attack Prevention:** Implement timestamp-based validation and nonce tracking to prevent replay attacks of valid event payloads
+* **Rate Limiting:** Implement rate limiting on webhook endpoints to prevent abuse and ensure system stability
+* **Event Type Whitelisting:** Only process explicitly expected event types, rejecting unknown or unauthorized event types
+
+```javascript
+// Example secure event validation pattern
+async function validateIncomingEvent(params) {
+  // 1. Signature validation
+  const isValidSignature = validateEventSignature(
+    params.data, 
+    params.__ow_headers['x-adobe-signature'], 
+    params.ADOBE_IO_EVENTS_CLIENT_SECRET
+  );
+  if (!isValidSignature) {
+    throw new Error('Invalid event signature - potential security threat');
+  }
+
+  // 2. Timestamp validation (prevent replay attacks)
+  const eventTimestamp = new Date(params.data.event['xdm:timestamp']);
+  const now = new Date();
+  const timeDiff = Math.abs(now - eventTimestamp);
+  if (timeDiff > 300000) { // 5 minutes tolerance
+    throw new Error('Event timestamp outside acceptable window');
+  }
+
+  // 3. Event type validation
+  const allowedEventTypes = [
+    'com.adobe.commerce.customer.created',
+    'com.adobe.commerce.order.placed'
+  ];
+  if (!allowedEventTypes.includes(params.data.event['@type'])) {
+    throw new Error('Unauthorized event type');
+  }
+
+  return true;
+}
+```
+
+### Web Action Security
+
+When creating web actions, implement proper security measures:
+* **Parameter Sealing:** Use default parameters in manifest.yaml to seal sensitive values, making them immutable and preventing client override
+* **Referrer Validation:** Implement referrer checking for additional protection against unauthorized domain usage
+* **HTTP Context Awareness:** Leverage `__ow_headers`, `__ow_method`, and `__ow_path` for security validation
+* **Content-Type Validation:** Validate incoming content-types and handle raw web actions securely with proper base64 decoding
+
+### Runtime Security
+
+Implement runtime action security best practices:
+* **Container Isolation:** Each action runs in its own container with strict tenant isolation. Containers may be reused for the same action but never shared across applications or users
+* **Resource Protection:** Prevent actions from modifying themselves or executing unauthorized code
+* **Network Security:** All communications are secured by HTTPS. Ensure all external service calls use HTTPS or secure channels
+* **Logging & Monitoring:** Implement comprehensive logging to detect anomalous behavior, long execution times, or unexpected results
+
+### Tenant Isolation
+
+App Builder enforces strict multi-level isolation:
+* **Enterprise Organization** → **Project** → **Workspace** → **Runtime Namespace** hierarchy
+* **Cloud Storage & CDN:** Static SPA assets are isolated by Runtime namespace with dedicated subdomains
+* **Files and State Services:** Data access is restricted to the Runtime namespace of the executing action
+* **Runtime Actions:** Respect tenant isolation model with namespace-based separation
+
+### Data Storage Security
+
+* **Token Vending Machine (TVM):** File and data storage access uses temporary, restricted tokens
+* **Application Isolation:** Files and data are containerized and isolated by application at the service level
+* **Access Control:** Applications cannot access files or data from other applications
+
+### Secrets Management (CRITICAL)
+
+Never store sensitive data like API keys, tokens, or passwords in `.env` files or hardcode them. Use App Builder's **default parameters** feature in the `manifest.yaml` file for secure credential management. All default params are automatically encrypted and only decrypted during action execution. Reference environment variables in manifest.yaml like `$API_KEY` and store actual values in .env for local development only.
+
+### Event-Specific Secret Management
+
+For Commerce event integrations, securely manage event-related credentials:
+
+* **Adobe I/O Events Client Secret:** Store in default parameters, never in code or logs. Use for webhook signature validation
+* **Commerce API Credentials:** Isolate Commerce-specific credentials (OAuth tokens, API keys) using environment-specific parameter groups
+* **External System Credentials:** Use separate parameter namespaces for each external system integration to maintain isolation
+* **Credential Rotation:** Implement automated credential rotation patterns for long-running integrations
+* **Event Metadata Security:** Avoid logging sensitive event payload data; sanitize logs while preserving debugging capability
+
+```yaml
+# manifest.yaml - Secure credential configuration for events
+packages:
+  commerce-events:
+    actions:
+      customer-handler:
+        function: actions/customer/commerce/created/index.js
+        inputs:
+          # Adobe I/O Events credentials
+          ADOBE_IO_EVENTS_CLIENT_SECRET: $ADOBE_IO_EVENTS_CLIENT_SECRET
+          ADOBE_IO_EVENTS_CLIENT_ID: $ADOBE_IO_EVENTS_CLIENT_ID
+          
+          # External system credentials (isolated by system)
+          CRM_API_KEY: $CRM_API_KEY
+          CRM_BASE_URL: $CRM_BASE_URL
+          
+          # Environment-specific settings
+          LOG_LEVEL: $LOG_LEVEL
+          ENVIRONMENT: $ENVIRONMENT
+```
+
+### Additional Security Measures
+
+* **Dependency Security:** Regularly audit and update dependencies to prevent inheriting vulnerabilities. Use security scanning tools to check for known CVEs in your action dependencies.
+* **Least Privilege Principle:** Ensure actions operate with minimal required permissions and access only necessary resources and APIs. Configure workspace credentials appropriately for CLI and CI/CD access.
+
+## Performance & Scalability
+
+* **Efficient Actions:** Code within I/O Runtime actions must be efficient, stateless, and non-blocking. Avoid long-running synchronous operations that could lead to timeouts.
+* **Asynchronous Patterns:** Leverage the event-driven, asynchronous nature of App Builder. This is the default and preferred pattern for integrations.
+* **API Orchestration:** If a workflow requires fetching data from multiple APIs to build a single response, you must propose using **API Mesh** to orchestrate these calls into a single, efficient GraphQL request. This is a critical performance optimization technique.
+* **Resource Awareness:** While out-of-process extensions can scale independently, the code within them must still be performant. Minimize database operations and use efficient data processing techniques. Avoid unnecessary logic execution by placing plugins and observers in the correct area (frontend, adminhtml, webapi_rest) rather than global.
+* **State Management Optimization:** Use State storage for frequently accessed data to reduce API calls. Implement appropriate TTL values to balance performance with data freshness. Choose the optimal region for State storage based on user location and compliance requirements.
+
+## Maintainability & Code Quality
+
+* **Coding Standards:** Strictly adhere to PSR-2 and PSR-4 coding standards for any PHP-related code.
+* **Object-Oriented Principles:** Favor **composition over inheritance**. This is a core principle for Magento 2+ development that leads to more flexible and maintainable code. Avoid creating "Helper" classes, as they are an anti-pattern; refactor utility methods into the appropriate classes where they belong.
+* **Modularity:** Write code that is reusable, replaceable, and loosely coupled. This makes future updates and bug fixes significantly easier.
+* **Clarity:** Generate clear, concise comments, especially for complex business logic within transformer.js or sender.js. Use consistent and meaningful naming conventions for files, classes, and methods.
+* **Plugin Usage:** Avoid using around method plugins unless absolutely necessary to terminate the execution of an original method. They increase stack traces and negatively impact performance.
+
+## Testing Strategy (CONDITIONAL)
+
+* **Test Generation Based on User Preference:** Generate comprehensive test coverage only when requested by the user in Phase 1. If declined, include testing recommendations in final summary and next steps.
+* **When Tests Are Requested:**
+  * **Test File Creation:** Create test files for every implementation file, covering all functionality contained in that file.
+  * **Test Types Required:**
+    * **Unit Tests:** Test individual functions and methods in isolation
+    * **Integration Tests:** Test the interaction between components (validator → transformer → sender)
+    * **API Tests:** Test external API integrations with mock responses
+    * **State Management Tests:** Test state operations including TTL behavior and error handling
+    * **Event Security Tests:** Test webhook signature validation, payload validation, and event source verification
+    * **Event Flow Tests:** Test complete event processing pipelines from Commerce event to external system
+  * **Test Structure:** Follow the existing test patterns in the Integration Starter Kit. Place tests in the `/test` directory mirroring the `/actions` structure.
+  * **Test Coverage Requirements:**
+    * All validation logic in validator.js files
+    * All transformation logic in transformer.js files
+    * All external API calls in sender.js files
+    * Error handling and edge cases
+    * State management operations when applicable
+    * Event signature validation and security measures
+    * Event payload schema validation
+    * Error retry and dead letter queue scenarios
+  * **Mock Strategy:** Use proper mocking for external dependencies (APIs, Commerce services) to ensure tests are reliable and fast.
+
+### Event Testing Patterns
+
+* **Local Event Simulation:** Generate mock event payloads that match Adobe I/O Events structure for local testing
+* **Webhook Signature Testing:** Test signature validation with both valid and invalid signatures to ensure security
+* **Event Processing Pipeline Testing:** Test complete flows from event receipt through external system integration
+* **Error Handling Testing:** Simulate various failure scenarios (network timeouts, invalid payloads, external system errors)
+* **Performance Testing:** Test event processing under load to ensure scalability
+
+```javascript
+// Example event testing pattern
+describe('Commerce Event Handler', () => {
+  it('should validate event signature correctly', async () => {
+    const mockEvent = createMockCommerceEvent();
+    const validSignature = generateValidSignature(mockEvent);
+    
+    const result = await validateEventSignature(
+      mockEvent, 
+      validSignature, 
+      'test-secret'
+    );
+    
+    expect(result).toBe(true);
+  });
+
+  it('should reject events with invalid signatures', async () => {
+    const mockEvent = createMockCommerceEvent();
+    const invalidSignature = 'invalid-signature';
+    
+    await expect(
+      eventHandler.main({
+        data: mockEvent,
+        __ow_headers: { 'x-adobe-signature': invalidSignature }
+      })
+    ).rejects.toThrow('Invalid event signature');
+  });
+});
+```
+
+### Local Event Testing & Debugging
+
+* **MCP Tools for Local Testing:** Use `aio-dev-invoke` to test event handlers locally with mock payloads
+* **Event Simulation Scripts:** Create scripts to simulate Commerce events for development and testing
+* **Log Analysis:** Implement structured logging for event processing to facilitate debugging
+* **Performance Profiling:** Test event processing performance and identify bottlenecks
+
+```bash
+# Local event testing workflow
+aio app dev  # Start local development server
+
+# Test event handler with mock payload
+aio-dev-invoke customer-created --parameters '{
+  "data": {
+    "event": {"@type": "com.adobe.commerce.customer.created"},
+    "data": {"customer": {"id": 123, "email": "test@example.com"}}
+  },
+  "__ow_headers": {"x-adobe-signature": "sha256=valid-signature"}
+}'
+
+# Monitor logs in real-time
+aio app logs --tail
+```
+
+* **When Tests Are Declined:** Include comprehensive testing recommendations in the implementation summary, covering security testing, performance testing, integration testing, and event flow testing best practices.

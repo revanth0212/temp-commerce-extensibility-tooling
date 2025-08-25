@@ -1,0 +1,15 @@
+{
+  "name": "commerce-event-subscribe",
+  "description": "Run npm run commerce-event-subscribe to subscribe to Commerce events for product and customer changes. This script sets up event listeners for catalog operations, customer operations, and customer group operations using Commerce OAuth1 authentication.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output (optional, default: false)",
+        "default": false
+      }
+    },
+    "required": []
+  }
+} 

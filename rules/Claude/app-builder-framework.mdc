@@ -1,0 +1,290 @@
+---
+alwaysApply: true
+---
+# Claude Extension Agent - App Builder Technical Framework
+
+## JAMStack Architecture Foundation
+
+### Application Types & Patterns
+
+**Single Page Applications (SPAs):**
+* **Use Case:** When admin UI components are required for configuration, monitoring, or management
+* **Architecture:** React-based frontend with Spectrum components + backend Runtime actions
+* **Deployment:** Static assets served via CDN with API backend in Runtime
+* **Security:** User-context authentication with Adobe IMS user tokens
+
+**Headless Applications:**
+* **Use Case:** Backend integrations, data synchronization, and API orchestrations (most common)
+* **Architecture:** Pure Runtime actions without frontend UI components
+* **Deployment:** Server-to-server logic deployed to Adobe I/O Runtime
+* **Security:** Service-to-service authentication with Adobe IMS JWT tokens
+
+**Hybrid Applications:**
+* **Use Case:** Complex workflows requiring both UI and background processing
+* **Architecture:** Combination of SPA components and headless background services
+* **Deployment:** Multi-component deployment with different scaling characteristics
+
+### Runtime Actions Architecture
+
+#### Serverless Foundation
+* **Container Isolation:** Each action runs in isolated containers providing tenant separation
+* **Resource Allocation:** Configurable memory (128MB - 4GB) and timeout (1s - 600s) settings
+* **Performance Characteristics:** Cold start optimization and warm container reuse
+* **Scalability:** Auto-scaling based on demand with concurrent execution limits
+
+#### Action Implementation Patterns
+```javascript
+// Standard action structure with comprehensive error handling
+async function main(params) {
+  const startTime = Date.now();
+  
+  try {
+    // Input validation
+    const validatedParams = await validateInput(params);
+    
+    // Business logic processing
+    const result = await processBusinessLogic(validatedParams);
+    
+    // Performance logging
+    console.log(`Action completed in ${Date.now() - startTime}ms`);
+    
+    return {
+      statusCode: 200,
+      body: result,
+      headers: { 'Content-Type': 'application/json' }
+    };
+  } catch (error) {
+    console.error('Action failed:', error.message);
+    return {
+      statusCode: 500,
+      body: { error: 'Internal server error' }
+    };
+  }
+}
+
+exports.main = main;
+```
+
+## State Management Architecture
+
+### State Storage (< 100KB)
+* **Use Case:** Configuration data, small caches, processing status
+* **TTL Management:** Configurable expiration (1 minute to 1 year)
+* **Regional Deployment:** Choose region (amer/emea/apac) for compliance and latency
+* **Performance:** Sub-millisecond access times for frequently accessed data
+
+```javascript
+// State storage example with error handling
+const { Core } = require('@adobe/aio-sdk');
+
+async function storeCustomerMapping(customerId, crmId) {
+  const state = await Core.State.init();
+  
+  try {
+    await state.put(`customer_mapping_${customerId}`, {
+      crmId: crmId,
+      timestamp: Date.now()
+    }, { ttl: 86400 }); // 24 hours TTL
+    
+    console.log(`Stored mapping: Commerce ID ${customerId} -> CRM ID ${crmId}`);
+  } catch (error) {
+    console.error('Failed to store customer mapping:', error.message);
+    throw error;
+  }
+}
+```
+
+### Files Storage (> 100KB)
+* **Use Case:** Large payloads, file uploads, bulk data processing
+* **Presigned URLs:** Secure temporary access for file sharing
+* **Lifecycle Management:** Automatic cleanup and retention policies
+* **Performance:** Optimized for large file operations with resumable uploads
+
+```javascript
+// Files storage example with presigned URL generation
+const { Core } = require('@adobe/aio-sdk');
+
+async function storeLargePayload(data, filename) {
+  const files = await Core.Files.init();
+  
+  try {
+    // Store file
+    await files.write(filename, JSON.stringify(data));
+    
+    // Generate presigned URL for sharing (1 hour expiry)
+    const presignedUrl = await files.generatePresignedPutURL(filename, 3600);
+    
+    console.log(`Stored large payload: ${filename}`);
+    return presignedUrl;
+  } catch (error) {
+    console.error('Failed to store large payload:', error.message);
+    throw error;
+  }
+}
+```
+
+## Security Architecture
+
+### Multi-Layered Access Control
+1. **Experience Cloud Organization:** Users must be members of the org that owns the application
+2. **Adobe Application Access:** Access to all Adobe applications used by the extension
+3. **IMS Token Validation:** All Adobe API interactions require valid bearer tokens
+4. **Tenant Isolation:** Runtime namespace-based separation of resources
+
+### Authentication Patterns
+
+#### IMS Authentication for Headless Applications
+```javascript
+// IMS JWT authentication with automatic refresh
+const { Core } = require('@adobe/aio-sdk');
+
+async function getImsToken() {
+  try {
+    const imsToken = await Core.IMS.getAccessToken();
+    console.log('Successfully obtained IMS access token');
+    return imsToken;
+  } catch (error) {
+    console.error('Failed to obtain IMS token:', error.message);
+    throw new Error('Authentication failed');
+  }
+}
+```
+
+#### Secrets Management with Default Parameters
+```yaml
+# manifest.yaml - Secure configuration
+packages:
+  commerce-extension:
+    actions:
+      customer-sync:
+        function: actions/customer/commerce/created/index.js
+        runtime: nodejs:20
+        inputs:
+          # Sealed parameters - immutable at runtime
+          CRM_API_KEY: $CRM_API_KEY
+          CRM_ENDPOINT: $CRM_ENDPOINT
+          LOG_LEVEL: $LOG_LEVEL
+        annotations:
+          require-adobe-auth: true
+```
+
+## Event-Driven Architecture
+
+### Adobe I/O Events Integration
+* **Event Registration:** Configure events via Adobe Developer Console or REST API
+* **Event Delivery:** Reliable delivery with retry mechanisms and dead letter queues
+* **Event Security:** HMAC signature validation and event source verification
+* **Event Processing:** Asynchronous processing with error handling and monitoring
+
+### Commerce Event Handling Pattern
+```javascript
+// Commerce event handler with comprehensive validation
+async function handleCommerceEvent(params) {
+  try {
+    // Validate event signature
+    await validateEventSignature(params);
+    
+    // Parse Commerce event data
+    const eventData = parseCommerceEvent(params.data);
+    
+    // Process based on event type
+    switch (eventData.eventType) {
+      case 'com.adobe.commerce.customer.created':
+        await handleCustomerCreated(eventData);
+        break;
+      case 'com.adobe.commerce.order.placed':
+        await handleOrderPlaced(eventData);
+        break;
+      default:
+        console.warn(`Unknown event type: ${eventData.eventType}`);
+    }
+    
+    return { statusCode: 200, body: { processed: true } };
+  } catch (error) {
+    console.error('Event processing failed:', error.message);
+    return { statusCode: 500, body: { error: error.message } };
+  }
+}
+```
+
+## API Orchestration with API Mesh
+
+### GraphQL Orchestration
+* **Schema Composition:** Combine multiple APIs into unified GraphQL schema
+* **Performance Optimization:** Intelligent query planning and batching
+* **Caching Strategy:** Multi-level caching with appropriate TTL values
+* **Error Handling:** Graceful degradation and fallback mechanisms
+
+### External API Integration
+```javascript
+// External API integration with retry logic
+const axios = require('axios');
+
+async function callExternalAPI(endpoint, data, headers) {
+  const maxRetries = 3;
+  let retryCount = 0;
+  
+  while (retryCount < maxRetries) {
+    try {
+      const response = await axios.post(endpoint, data, {
+        headers: headers,
+        timeout: 10000 // 10 second timeout
+      });
+      
+      console.log(`API call successful on attempt ${retryCount + 1}`);
+      return response.data;
+    } catch (error) {
+      retryCount++;
+      
+      if (retryCount >= maxRetries) {
+        console.error(`API call failed after ${maxRetries} attempts:`, error.message);
+        throw error;
+      }
+      
+      // Exponential backoff
+      const delay = Math.pow(2, retryCount) * 1000;
+      await new Promise(resolve => setTimeout(resolve, delay));
+      
+      console.warn(`API call failed, retrying in ${delay}ms...`);
+    }
+  }
+}
+```
+
+## Development Tools & CLI Integration
+
+### Essential CLI Commands
+* **`aio app init`** - Initialize new App Builder project from templates
+* **`aio app dev`** - Start local development server with hot reload
+* **`aio app deploy`** - Deploy application to Adobe I/O Runtime
+* **`aio app logs`** - View real-time application logs
+* **`aio app test`** - Run application test suites
+* **`aio app undeploy`** - Remove application from runtime
+
+### Local Development Workflow
+```bash
+# Start local development server
+aio app dev
+
+# In separate terminal, test actions locally
+curl -X POST http://localhost:3233/api/v1/web/my-extension/customer-sync \
+  -H "Content-Type: application/json" \
+  -d '{"customerId": "12345"}'
+
+# Monitor logs in real-time
+aio app logs --tail
+```
+
+### Deployment Configuration
+```yaml
+# app.config.yaml - Application configuration
+application:
+  actions: './src/actions'
+  web: './src/web-src'
+  
+  hooks:
+    pre-app-build: 'npm run build'
+    post-app-deploy: 'npm run test:deployment'
+```
+
+This comprehensive technical framework ensures optimal implementation of Adobe Developer App Builder applications with proper security, performance, and maintainability characteristics.

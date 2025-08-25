@@ -1,0 +1,31 @@
+{
+  "name": "adobe-io-tools-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server providing Adobe I/O CLI tools for deployment and management",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "adobe-io-tools-mcp-server": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "npx @modelcontextprotocol/inspector node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "cursor",
+    "adobe",
+    "aio",
+    "deployment"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "dotenv": "^16.3.1",
+    "js-yaml": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

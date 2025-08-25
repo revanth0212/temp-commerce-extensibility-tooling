@@ -1,0 +1,455 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - Event Registration & Subscription Workflow
+
+## Commerce-to-App Builder Event Flow
+
+This is the complete workflow for establishing event-driven communication between Adobe Commerce and App Builder actions. Master this process to build robust, scalable integrations.
+
+### Event Flow Architecture
+
+Commerce Events → Adobe I/O Events → App Builder Runtime Actions → External Systems
+
+```
+[Commerce Store] --event--> [Commerce Events Module] --webhook--> [Adobe I/O Events] --trigger--> [App Builder Action] --API--> [External System]
+```
+
+## Phase 1: Commerce Events Module Setup
+
+### For Adobe Commerce SaaS
+The Commerce Events module is **pre-installed**. Configure via Admin UI:
+
+1. **Navigate to System > Adobe I/O Events**
+2. **Configure Event Provider:**
+   - Event Provider Name: `your-commerce-instance-events`
+   - Instance ID: Auto-generated or provided by Adobe
+   - Event Metadata Endpoint: Auto-configured
+3. **Enable Event Categories:**
+   - Customer Events: `customer.created`, `customer.updated`, `customer.deleted`
+   - Product Events: `catalog.product.created`, `catalog.product.updated`, `catalog.product.deleted`
+   - Order Events: `sales.order.created`, `sales.order.updated`, `sales.order.shipped`
+   - Custom Events: Based on your integration requirements
+
+### For Adobe Commerce PaaS
+Install and configure the Commerce Events module:
+
+```bash
+# Install Commerce Events module
+composer require magento/commerce-eventing
+
+# Enable module
+bin/magento module:enable Magento_AdobeCommerceEventsClient Magento_AdobeCommerceEventsGenerator
+
+# Configure event provider
+bin/magento events:create:event-provider
+```
+
+**Configuration Steps:**
+1. **Set Environment Variables:**
+   ```bash
+   # Adobe I/O Configuration
+   COMMERCE_EVENTS_CLIENT_ID=your_client_id
+   COMMERCE_EVENTS_CLIENT_SECRET=your_client_secret
+   COMMERCE_EVENTS_ORGANIZATION_ID=your_org_id
+   COMMERCE_EVENTS_PROJECT_ID=your_project_id
+   COMMERCE_EVENTS_WORKSPACE_ID=your_workspace_id
+   ```
+
+2. **Generate Event Metadata:**
+   ```bash
+   bin/magento events:generate:module
+   bin/magento events:subscribe --event="observer.customer_save_after"
+   ```
+
+## Phase 2: Adobe Developer Console Configuration
+
+### Project Setup
+1. **Create/Select Adobe Developer Project**
+2. **Add Adobe I/O Events API**
+3. **Configure Event Provider:**
+   - Provider ID: Match Commerce configuration
+   - Event Metadata: Import from Commerce Events module
+   - Webhook Endpoints: Your App Builder action URLs
+
+### Event Registration Configuration
+```json
+{
+  "eventProvider": {
+    "id": "commerce-events-provider",
+    "label": "Commerce Events Provider",
+    "description": "Events from Adobe Commerce instance",
+    "source": "urn:uuid:your-commerce-instance-id"
+  },
+  "eventTypes": [
+    {
+      "code": "com.adobe.commerce.customer.created",
+      "label": "Customer Created",
+      "description": "Triggered when a new customer registers"
+    },
+    {
+      "code": "com.adobe.commerce.order.placed",
+      "label": "Order Placed", 
+      "description": "Triggered when a new order is created"
+    }
+  ]
+}
+```
+
+## Phase 3: App Builder Event Handler Implementation
+
+### Event Handler Action Structure
+Follow the Integration Starter Kit pattern:
+
+```
+/actions/
+  ├── customer/
+  │   └── commerce/
+  │       ├── created/
+  │       │   ├── index.js          # Main event handler
+  │       │   ├── validator.js      # Event payload validation
+  │       │   ├── transformer.js    # Data transformation logic
+  │       │   └── sender.js         # External system integration
+  │       └── updated/
+  └── order/
+      └── commerce/
+          └── placed/
+```
+
+### Event Handler Implementation Pattern
+
+**index.js - Main Event Handler:**
+```javascript
+const validator = require('./validator');
+const transformer = require('./transformer');
+const sender = require('./sender');
+const { Core } = require('@adobe/aio-sdk');
+
+async function main(params) {
+  const logger = Core.Logger('customer-created-handler', { level: params.LOG_LEVEL || 'info' });
+  
+  try {
+    // 1. Validate Adobe I/O Event signature
+    const isValidSignature = await validateEventSignature(params);
+    if (!isValidSignature) {
+      return { statusCode: 401, body: 'Invalid event signature' };
+    }
+
+    // 2. Validate event payload structure
+    const validationResult = await validator.validatePayload(params.data);
+    if (!validationResult.isValid) {
+      logger.error('Invalid payload:', validationResult.errors);
+      return { statusCode: 400, body: 'Invalid payload' };
+    }
+
+    // 3. Transform Commerce event to target format
+    const transformedData = await transformer.transform(params.data);
+    
+    // 4. Send to external system
+    const result = await sender.send(transformedData, params);
+    
+    logger.info('Event processed successfully:', result);
+    return { statusCode: 200, body: result };
+    
+  } catch (error) {
+    logger.error('Event processing failed:', error);
+    return { statusCode: 500, body: 'Internal server error' };
+  }
+}
+
+async function validateEventSignature(params) {
+  const crypto = require('crypto');
+  const expectedSignature = params.__ow_headers['x-adobe-signature'];
+  const payload = JSON.stringify(params.data);
+  const computedSignature = crypto
+    .createHmac('sha256', params.ADOBE_IO_EVENTS_CLIENT_SECRET)
+    .update(payload)
+    .digest('hex');
+  
+  return `sha256=${computedSignature}` === expectedSignature;
+}
+
+exports.main = main;
+```
+
+**validator.js - Event Payload Validation:**
+```javascript
+const Joi = require('joi');
+
+const customerCreatedSchema = Joi.object({
+  event: Joi.object({
+    '@id': Joi.string().required(),
+    '@type': Joi.string().valid('com.adobe.commerce.customer.created').required(),
+    'xdm:timestamp': Joi.date().iso().required(),
+    'xdm:dataSource': Joi.object({
+      '@id': Joi.string().required()
+    }).required()
+  }).required(),
+  data: Joi.object({
+    customer: Joi.object({
+      id: Joi.number().required(),
+      email: Joi.string().email().required(),
+      firstname: Joi.string().required(),
+      lastname: Joi.string().required(),
+      created_at: Joi.date().iso().required(),
+      store_id: Joi.number().required()
+    }).required()
+  }).required()
+});
+
+async function validatePayload(payload) {
+  try {
+    const { error, value } = customerCreatedSchema.validate(payload);
+    if (error) {
+      return { isValid: false, errors: error.details };
+    }
+    return { isValid: true, data: value };
+  } catch (err) {
+    return { isValid: false, errors: [err.message] };
+  }
+}
+
+module.exports = { validatePayload };
+```
+
+## Phase 4: Event Subscription Setup
+
+### Using MCP Tools (Preferred)
+```javascript
+// Use aio-onboard for initial setup
+await mcp_adobe_io_mcp_aio_onboard({
+  verbose: true
+});
+
+// Use aio-commerce-event-subscribe for event subscriptions
+await mcp_adobe_io_mcp_aio_commerce_event_subscribe({
+  verbose: true
+});
+```
+
+### Manual CLI Setup
+```bash
+# Configure event provider
+aio events provider create --name "commerce-events" --description "Commerce instance events"
+
+# Create event registration
+aio events registration create \
+  --name "customer-events-registration" \
+  --description "Customer lifecycle events" \
+  --delivery-type webhook \
+  --webhook-url "https://your-namespace.adobeioruntime.net/api/v1/web/customer/commerce/created"
+
+# Subscribe to specific events
+aio events subscription create \
+  --name "customer-created-subscription" \
+  --event-provider-id "your-provider-id" \
+  --event-code "com.adobe.commerce.customer.created" \
+  --webhook-url "https://your-namespace.adobeioruntime.net/api/v1/web/customer/commerce/created"
+```
+
+### App Configuration (manifest.yml)
+```yaml
+packages:
+  customer-events:
+    license: Apache-2.0
+    actions:
+      commerce-customer-created:
+        function: actions/customer/commerce/created/index.js
+        web: 'yes'
+        runtime: nodejs:18
+        inputs:
+          LOG_LEVEL: debug
+          ADOBE_IO_EVENTS_CLIENT_SECRET: $ADOBE_IO_EVENTS_CLIENT_SECRET
+          CRM_API_KEY: $CRM_API_KEY
+          CRM_BASE_URL: $CRM_BASE_URL
+        annotations:
+          require-adobe-auth: false
+          raw-http: true
+```
+
+## Phase 5: Testing & Verification
+
+### Local Event Simulation
+```javascript
+// Test event handler locally
+const handler = require('./actions/customer/commerce/created/index.js');
+
+const mockEvent = {
+  data: {
+    event: {
+      '@id': 'test-event-123',
+      '@type': 'com.adobe.commerce.customer.created',
+      'xdm:timestamp': new Date().toISOString(),
+      'xdm:dataSource': { '@id': 'commerce-instance-123' }
+    },
+    data: {
+      customer: {
+        id: 123,
+        email: 'test@example.com',
+        firstname: 'John',
+        lastname: 'Doe',
+        created_at: new Date().toISOString(),
+        store_id: 1
+      }
+    }
+  },
+  __ow_headers: {
+    'x-adobe-signature': 'sha256=computed-signature'
+  },
+  LOG_LEVEL: 'debug',
+  ADOBE_IO_EVENTS_CLIENT_SECRET: 'your-secret'
+};
+
+handler.main(mockEvent).then(console.log);
+```
+
+### Event Flow Verification
+1. **Trigger Test Event in Commerce:**
+   ```bash
+   # Create test customer to trigger event
+   bin/magento events:test:customer-created
+   ```
+
+2. **Monitor Event Delivery:**
+   ```bash
+   # Watch App Builder logs
+   aio app logs --tail
+   
+   # Check Adobe I/O Events delivery status
+   aio events subscription list --details
+   ```
+
+3. **Verify External System Integration:**
+   - Check external system logs
+   - Verify data transformation accuracy
+   - Confirm retry logic for failed deliveries
+
+## Event Types & Payload Examples
+
+### Customer Events
+```javascript
+// customer.created
+{
+  "event": {
+    "@id": "urn:uuid:event-123",
+    "@type": "com.adobe.commerce.customer.created",
+    "xdm:timestamp": "2024-01-15T10:30:00Z"
+  },
+  "data": {
+    "customer": {
+      "id": 123,
+      "email": "customer@example.com",
+      "firstname": "John",
+      "lastname": "Doe",
+      "store_id": 1,
+      "group_id": 1,
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  }
+}
+```
+
+### Order Events
+```javascript
+// order.placed
+{
+  "event": {
+    "@id": "urn:uuid:order-event-456",
+    "@type": "com.adobe.commerce.order.placed",
+    "xdm:timestamp": "2024-01-15T11:00:00Z"
+  },
+  "data": {
+    "order": {
+      "id": 789,
+      "increment_id": "000000123",
+      "customer_id": 123,
+      "status": "pending",
+      "total": 99.99,
+      "currency": "USD",
+      "items": [
+        {
+          "sku": "PROD-123",
+          "qty": 2,
+          "price": 49.99
+        }
+      ]
+    }
+  }
+}
+```
+
+## Error Handling & Retry Strategy
+
+### Webhook Retry Configuration
+Adobe I/O Events automatically retries failed webhook deliveries:
+- Initial retry: Immediate
+- Subsequent retries: Exponential backoff
+- Maximum retries: 10 attempts over 24 hours
+- Dead letter queue: After max retries
+
+### Action Error Handling
+```javascript
+// Implement proper error responses for retry logic
+async function main(params) {
+  try {
+    // Processing logic
+    return { statusCode: 200, body: 'Success' };
+  } catch (error) {
+    if (error.isRetryable) {
+      // Return 5xx for retryable errors
+      return { statusCode: 500, body: 'Temporary failure - retry' };
+    } else {
+      // Return 4xx for non-retryable errors
+      return { statusCode: 400, body: 'Permanent failure - no retry' };
+    }
+  }
+}
+```
+
+## Monitoring & Observability
+
+### Key Metrics to Track
+- Event delivery success rate
+- Processing latency
+- Error rates by event type
+- External system response times
+- Retry attempt frequency
+
+### Logging Best Practices
+```javascript
+const logger = Core.Logger('event-handler', { 
+  level: params.LOG_LEVEL || 'info' 
+});
+
+// Log structured data for monitoring
+logger.info('Processing event', {
+  eventId: params.data.event['@id'],
+  eventType: params.data.event['@type'],
+  customerId: params.data.data.customer?.id,
+  timestamp: new Date().toISOString()
+});
+```
+
+## Security Considerations
+
+### Event Signature Validation
+Always validate Adobe I/O Events signatures to ensure authenticity:
+
+```javascript
+function validateSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(JSON.stringify(payload))
+    .digest('hex');
+  
+  return `sha256=${expectedSignature}` === signature;
+}
+```
+
+### Secure Credential Management
+- Store secrets in App Builder default parameters
+- Use environment-specific configurations
+- Rotate credentials regularly
+- Implement least-privilege access patterns
+
+This workflow ensures reliable, secure, and scalable event-driven integrations between Commerce and external systems using App Builder's serverless architecture.

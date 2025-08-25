@@ -1,0 +1,211 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - Integration Starter Kit & Development Process
+
+## The Integration Starter Kit
+
+This is your mandatory starting point for building back-office integrations.
+
+### Purpose
+
+The Integration Starter Kit is a pre-built App Builder application template that provides a standardized architecture for synchronizing data between Adobe Commerce and external systems. It is not merely a suggestion; it is a prescriptive framework that embodies Adobe's best practices.
+
+### Architectural Contract
+
+The kit's directory structure is a blueprint for your generated code. You must interpret user requests as tasks to populate the correct parts of this structure:
+
+* **/actions/\<entity\>/\<system\>/\<event\>:** This is the core structure. For example, logic to handle a new customer created in Commerce and send it to an external system belongs in /actions/customer/commerce/created/.
+* **index.js:** The main entry point for an action.
+* **validator.js:** Logic to validate the incoming event payload.
+* **transformer.js:** Logic to transform the payload from the source format (e.g., Commerce event) to the target format (e.g., external CRM API).
+* **sender.js:** Logic to send the transformed payload to the target system's API.
+
+### Onboarding
+
+You must assume the developer has followed the complete onboarding process for the starter kit, which includes creating a project in the Adobe Developer Console, configuring APIs, and setting up the .env file with the necessary credentials for PaaS or SaaS environments.
+
+### Event Configuration Management (CRITICAL)
+
+The Integration Starter Kit includes several configuration files that define event subscriptions and metadata. You **must** update these files whenever implementing new event handlers or modifying existing ones:
+
+#### Configuration Files Structure
+```
+scripts/
+├── commerce-event-subscribe/
+│   └── config/
+│       └── commerce-event-subscribe.json     # Event subscription definitions
+└── onboarding/
+    └── config/
+        ├── events.json                       # Event metadata and sample templates
+        ├── providers.json                    # Event provider definitions
+        └── starter-kit-registrations.json   # Entity-to-provider mappings
+```
+
+#### File Responsibilities
+- **`commerce-event-subscribe.json`**: Defines which Commerce events to subscribe to and which fields are required
+- **`events.json`**: Contains event metadata, sample event templates, and event type definitions for both Commerce and backoffice events
+- **`providers.json`**: Defines event providers (typically "commerce" and "backoffice")
+- **`starter-kit-registrations.json`**: Maps entities (customer, order, product, stock) to their associated providers
+
+#### Update Requirements
+When implementing new event handlers, you **must**:
+1. **Update commerce-event-subscribe.json** with the new event subscription including required fields
+2. **Update events.json** with event metadata and sample event templates under the correct entity and system
+3. **Verify providers.json** contains the necessary providers (usually no changes needed)
+4. **Update starter-kit-registrations.json** if adding new entities or changing provider mappings
+5. **Ensure consistency** between configuration files and implemented action structure
+
+## Operational Protocol (Step-by-Step Interaction Model)
+
+You must follow this structured, multi-phase process for every user request. Do not deviate.
+
+### Phase 1: Requirement Analysis & Clarification (Interactive)
+
+Before writing a single line of code, you **must**:
+
+1. **Check for REQUIREMENTS.md** file in the project root (same level as README.md)
+2. **If REQUIREMENTS.md exists:** Use it as the source of truth and validate user request against documented requirements
+3. **If REQUIREMENTS.md is missing:** Gather requirements through clarification questions and create the file
+
+**When gathering requirements** (if file is missing), ask the following clarifying questions if the information is not provided:
+
+* **Critical Question #1 (Target Environment):** "Is this extension intended for **Adobe Commerce PaaS**, **SaaS**, or must it be **compatible with both**? This is crucial as it affects API endpoints, authentication, and module deployment."
+* **Critical Question #2 (Triggering Mechanism):** "What specific **Adobe Commerce event(s)** or **webhook(s)** should trigger this extension's logic? Please provide the event name (e.g., sales_order_shipment_save_after, customer_save_after)."
+* **Critical Question #3 (External System Integration):** "If this extension integrates with a third-party system, please provide the following details for the target API:
+  * The full API endpoint URL.
+  * The authentication method (e.g., API Key, OAuth 2.0).
+  * A sample of the expected request payload format (JSON)."
+* **Critical Question #4 (Data Flow Direction):** "Is the data flow from Commerce to the external system, from the external system to Commerce, or bidirectional?"
+* **Critical Question #5 (Application Type):** "Should this be a **headless application** (backend-only Runtime actions for integrations) or a **Single Page Application** (SPA with both frontend UI and backend actions)? For Commerce extensions, most integrations are headless unless you need admin UI components."
+* **Critical Question #6 (State Requirements):** "Does this extension need to maintain state between invocations, cache data, or track processing status? If so, what type of data and for how long?"
+* **Critical Question #7 (Testing Preference):** "Would you like me to generate comprehensive test coverage for this extension? This includes unit tests, integration tests, API mocking, and event flow testing. If not now, I'll mention testing considerations in the final summary."
+
+### Phase 2: Architectural Planning
+
+After gathering requirements:
+
+1. **Create/Update REQUIREMENTS.md** if it was missing or needs updates with gathered information
+2. **Present the file to user** for review and approval
+3. **Present a high-level plan** based on the documented requirements
+
+This confirms your understanding and sets expectations.
+
+**Example Response:** "Understood. To fulfill your request for syncing new customer data to your CRM, I will generate the following components within the Integration Starter Kit structure:
+1. A **headless App Builder application** with Runtime actions located at actions/customer/commerce/created/ to handle the customer_save_after event from a SaaS-compatible Commerce instance.
+2. Proper app.config.yaml and manifest.yaml configuration for the headless deployment pattern with secure credential management.
+3. Logic within transformer.js to convert the Commerce customer event payload into the required JSON format for your CRM's /api/v1/contacts endpoint.
+4. Logic within sender.js to make a secure POST request to the CRM API, using the API key stored securely via App Builder's default parameters in manifest.yaml.
+5. State management to track synchronization status and handle retry logic for failed attempts with proper tenant isolation.
+6. [If testing requested] Comprehensive test coverage for all components including validator, transformer, and sender logic.
+7. I will implement IMS JWT authentication for server-to-server communication with automatic token refresh, as this is required for SaaS.
+8. After implementation, I will update the documentation with architectural diagrams showing the complete data flow, security boundaries, and tenant isolation model.
+9. I will provide comprehensive local verification documentation including setup instructions, essential aio CLI commands (`aio app dev` for local testing, `aio app deploy` for deployment, `aio app logs` for debugging), troubleshooting guide, and performance testing guidelines.
+10. If you approve, I can also execute the development workflow using integrated MCP tools for seamless aio commands within this environment."
+
+### Phase 3: Code Generation & Implementation
+
+Only after the user approves the plan will you proceed to generate the code.
+
+* Generate the code file-by-file, adhering strictly to the plan from Phase 2 and the structure of the Integration Starter Kit.
+* Provide clear filenames using Markdown (e.g., ### actions/customer/commerce/created/transformer.js).
+* Provide a brief explanation for each code block, especially the business logic within it.
+* **Event Configuration Management:** Always update the event subscription configuration files based on the user's requirements:
+  * **`scripts/commerce-event-subscribe/config/commerce-event-subscribe.json`**: Add/modify event subscriptions for Commerce events that trigger the extension
+  * **`scripts/onboarding/config/events.json`**: Add/modify event metadata and sample event templates for both Commerce and backoffice events
+  * **`scripts/onboarding/config/providers.json`**: Update event providers if new ones are needed (usually "commerce" and "backoffice" are sufficient)
+  * **`scripts/onboarding/config/starter-kit-registrations.json`**: Update entity-to-provider mappings when adding new entities or event flows
+* **Configuration File Updates:** When adding new event handlers:
+  1. **Identify the events**: Determine which Commerce events (e.g., `observer.customer_save_commit_after`) will trigger the extension
+  2. **Update commerce-event-subscribe.json**: Add the event name and required fields for event subscription
+  3. **Update events.json**: Add event metadata with sample event templates under the appropriate entity and system (commerce/backoffice)
+  4. **Update starter-kit-registrations.json**: Ensure the entity is mapped to the correct providers
+  5. **Validate consistency**: Ensure all configuration files are consistent with the implemented actions
+* **Conditional Testing:** Generate corresponding test files only if the user requested testing in Phase 1. If testing was declined, mention testing recommendations in the final summary.
+* **MCP Tools Integration:** After code generation, offer to execute development workflow using integrated MCP tools:
+  * `aio-login` for authentication setup
+  * `aio-app-dev` for starting local development server
+  * `aio-app-deploy` for deployment
+  * `aio-dev-invoke` for testing actions locally
+  * `aio-configure-global` for workspace configuration
+
+### Deployment Request Handler
+
+**When a user requests deployment** (using `aio app deploy`, MCP tools, or similar), **always** provide this readiness assessment first:
+
+```
+"Before we proceed with deployment, I recommend ensuring your code is production-ready. Would you like me to:
+
+1. **Add comprehensive test coverage** (if not already implemented)?
+2. **Clean up unnecessary code** including unused actions, dependencies, and test configurations?
+3. **Optimize for production** with performance improvements and security hardening?
+
+This ensures a robust, maintainable deployment. Should I proceed with these optimizations first, or would you prefer to deploy as-is?"
+```
+
+**Based on user response:**
+- **"Yes, optimize first"**: Execute the cleanup protocol from `deployment-and-cleanup.mdc`
+- **"No, deploy as-is"**: Proceed with deployment but include cleanup recommendations in post-deployment summary
+- **"Just tests/cleanup/optimization"**: Perform only the requested improvements then offer deployment
+
+### Phase 4: Documentation & Architectural Diagrams
+
+After completing the implementation, you **must** update documentation and create visual representations:
+
+* **Update Documentation:** Modify or create relevant README.md files in the docs/ directory with complete implementation details, including:
+  * Overview of the functionality implemented
+  * Event flow descriptions
+  * API integration details
+  * Configuration requirements
+  * Security considerations specific to the implementation
+  * **Local Verification Strategy:**
+    * **Setup Instructions:** Step-by-step local development environment setup
+    * **Essential Commands:**
+      * `aio app dev` - Local development with hot reload
+      * `aio app deploy` - Deploy to Runtime
+      * `aio app logs` - Real-time debugging logs
+      * `aio app test` - Run validation tests
+      * `aio app undeploy` - Cleanup/rollback
+      * **MCP Tools Integration:** When available, document usage of integrated MCP tools for seamless workflow execution
+    * **Testing & Debugging:** Local testing procedures, log analysis, and debugging strategies
+    * **Troubleshooting Guide:** Common issues, solutions, and error resolution steps
+    * **Performance Testing:** Load testing guidelines, performance benchmarks, and optimization recommendations
+* **Create Architectural Diagrams:** Generate Mermaid diagrams showing:
+  * Event flow from Commerce through App Builder to external systems
+  * Data transformation pipeline (validator → transformer → sender)
+  * State management workflow (if applicable)
+  * Security boundaries and authentication flows
+* **Provide Implementation Summary with Deployment Readiness:** Include comprehensive guidance covering:
+
+## 🚀 **Deployment Readiness Summary**
+
+Your App Builder integration is functionally complete. Before production deployment, consider these optimization steps:
+
+### 📋 **Cleanup Checklist**
+- [ ] **Remove test/debug actions**: Clean up development-only code and unused event handlers
+- [ ] **Optimize dependencies**: Remove unused packages, update security vulnerabilities, and clean devDependencies
+- [ ] **Production configuration**: Review manifest.yml and app.config.yaml for production settings
+- [ ] **Event subscription cleanup**: Remove test subscriptions and verify production event configurations
+- [ ] **Security validation**: Verify webhook signatures, credential management, and input validation
+- [ ] **Environment cleanup**: Remove test credentials and optimize environment variable usage
+
+### 🧪 **Testing Recommendations** (if testing was not implemented)
+- [ ] **Event flow testing**: Verify complete Commerce → App Builder → External System flow
+- [ ] **Security testing**: Test webhook signature validation and input sanitization  
+- [ ] **Performance testing**: Validate action execution times and external API response handling
+- [ ] **Error handling testing**: Test retry logic, failure scenarios, and dead letter queue behavior
+- [ ] **Local event simulation**: Test with mock Commerce events using MCP tools
+
+### 🔧 **Performance Optimization Opportunities**
+- [ ] **API call optimization**: Review external system integration patterns and implement batching
+- [ ] **Caching strategy**: Implement appropriate caching for frequently accessed data
+- [ ] **Action optimization**: Reduce cold start times and optimize payload processing
+- [ ] **Logging optimization**: Ensure production-appropriate logging levels and structured data
+
+### 🔒 **Security Hardening**
+- [ ] **Input validation review**: Ensure comprehensive validation in all validator.js files
+- [ ] **Error handling audit**: Verify no sensitive information leakage in error responses
+- [ ] **Credential management**: Confirm all secrets use default parameters, not hardcoded values
+- [ ] **Webhook security**: Validate signature verification and replay attack prevention
+
+**Ready to deploy?** When you request deployment, I'll offer to run the cleanup protocol first for production-ready code, or we can proceed directly based on your preference. Use `aio app deploy` or the MCP `aio-app-deploy` tool when ready.

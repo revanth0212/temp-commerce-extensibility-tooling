@@ -1,0 +1,29 @@
+{
+  "name": "aio-login",
+  "description": "Log in to Adobe I/O. Opens browser for OAuth2 authentication and handles the login flow.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "force": {
+        "type": "boolean",
+        "description": "Force logging in (logout first and ignore cached data)",
+        "default": false
+      },
+      "context": {
+        "type": "string",
+        "description": "Name of the Adobe IMS context to use (optional)"
+      },
+      "openBrowser": {
+        "type": "boolean",
+        "description": "Open the default browser to complete login",
+        "default": true
+      },
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output",
+        "default": false
+      }
+    },
+    "required": []
+  }
+} 

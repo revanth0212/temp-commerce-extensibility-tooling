@@ -1,0 +1,205 @@
+---
+alwaysApply: true
+---
+# Claude Extension Agent - Security & Quality Standards
+
+## Security by Design
+
+All code generated must adhere to these security principles. They are not optional.
+
+### Application Access Controls
+
+App Builder implements multi-layered access control:
+* **Experience Cloud Organization Membership:** Users must be members of the Experience Cloud org that owns the application
+* **Adobe Application Access:** Users must have access to ALL Adobe applications used by the App Builder extension
+* **IMS Token Validation:** All Adobe API interactions require Adobe IMS bearer tokens passed as Authorization headers
+
+### Authentication Architecture
+
+* **Single Page Applications:** Use Adobe IMS user tokens for user-context-aware applications
+* **Headless Applications:** Use Adobe IMS JWT access tokens (24-hour lifetime) for server-to-server communication
+* **Token Management:** Implement automatic token refresh using IMS SDK libraries
+* **IMS Libraries:** Use provided Adobe authentication libraries for seamless credential exchange and token caching
+
+### Input Validation & Parameter Sanitization
+
+Never trust incoming data. Always generate code that sanitizes and validates all payloads from events or API calls, using the validator.js file in the starter kit. For web actions, be especially cautious with parameters used in system calls, SQL queries, or eval operations.
+
+### Event Security & Webhook Validation
+
+For Commerce event-driven integrations, implement comprehensive security measures:
+
+* **Adobe I/O Event Signature Validation:** Always verify webhook signatures using HMAC-SHA256 with client secret
+* **Event Payload Schema Validation:** Use strict JSON schema validation to ensure event payloads match expected structure
+* **Event Source Verification:** Validate that events originate from authorized Commerce instances
+* **Replay Attack Prevention:** Implement timestamp-based validation and nonce tracking
+* **Rate Limiting:** Implement rate limiting on webhook endpoints to prevent abuse
+* **Event Type Whitelisting:** Only process explicitly expected event types
+
+```javascript
+// Example secure event validation pattern
+async function validateIncomingEvent(params) {
+  // 1. Signature validation
+  const isValidSignature = validateEventSignature(
+    params.data, 
+    params.__ow_headers['x-adobe-signature'], 
+    params.ADOBE_IO_EVENTS_CLIENT_SECRET
+  );
+  if (!isValidSignature) {
+    throw new Error('Invalid event signature - potential security threat');
+  }
+
+  // 2. Timestamp validation (prevent replay attacks)
+  const eventTimestamp = new Date(params.data.event['xdm:timestamp']);
+  const now = new Date();
+  const timeDiff = Math.abs(now - eventTimestamp);
+  if (timeDiff > 300000) { // 5 minutes tolerance
+    throw new Error('Event timestamp outside acceptable window');
+  }
+
+  // 3. Event type validation
+  const allowedEventTypes = [
+    'com.adobe.commerce.customer.created',
+    'com.adobe.commerce.order.placed'
+  ];
+  if (!allowedEventTypes.includes(params.data.event['@type'])) {
+    throw new Error('Unauthorized event type');
+  }
+
+  return true;
+}
+```
+
+### Secrets Management
+
+**CRITICAL RULE:** Never store secrets in `.env` files for production deployments.
+
+**Required Approach:**
+* **Manifest.yaml Default Parameters:** Use App Builder's default parameters feature for all sensitive values
+* **Parameter Sealing:** Default parameters are immutable at runtime
+* **Environment Separation:** Use different parameter sets for development, staging, and production
+* **Rotation Strategy:** Implement regular credential rotation procedures
+
+```yaml
+# manifest.yaml - Secure secrets management
+packages:
+  my-extension:
+    actions:
+      customer-sync:
+        function: actions/customer/commerce/created/index.js
+        runtime: nodejs:20
+        inputs:
+          CRM_API_KEY: $CRM_API_KEY        # Sealed parameter
+          CRM_ENDPOINT: $CRM_ENDPOINT      # Sealed parameter
+```
+
+## Performance & Scalability
+
+### Runtime Action Optimization
+
+* **Stateless Design:** Efficient, non-blocking action implementations designed for horizontal scaling
+* **Asynchronous Patterns:** Event-driven workflows with comprehensive error handling
+* **Resource Efficiency:** Optimized memory allocation and timeout configuration
+* **Cold Start Optimization:** Minimize initialization overhead
+* **Connection Pooling:** Reuse external API connections when possible
+
+### State Management Strategies
+
+When persistence is required:
+* **State Storage:** For data < 100KB with appropriate TTL values
+* **Files Storage:** For data > 100KB with presigned URL sharing
+* **Regional Selection:** Choose appropriate regions for compliance and latency optimization
+* **Error Handling:** Proper error handling for rate limits and storage quotas
+
+## Code Quality Standards
+
+### JavaScript/Node.js Excellence
+
+* **Async/Await Patterns:** Consistent asynchronous operation handling
+* **Error Handling:** Comprehensive try-catch blocks with meaningful error messages
+* **Code Documentation:** JSDoc comments for complex business logic
+* **Modular Design:** Reusable, loosely coupled components
+* **Performance Optimization:** Efficient algorithms and data processing
+
+### Testing Strategy (When Requested)
+
+```
+/test/<entity>/<system>/<event>/
+├── validator.test.js     # Input validation scenarios
+├── transformer.test.js   # Data transformation accuracy
+├── sender.test.js        # External API integration
+└── integration.test.js   # End-to-end workflow testing
+```
+
+### Error Handling & Monitoring
+
+```javascript
+// Standard error handling pattern
+async function main(params) {
+  const startTime = Date.now();
+  const requestId = generateRequestId();
+  
+  try {
+    const validatedParams = await validateInput(params);
+    
+    console.log(`[${requestId}] Processing started`, {
+      eventType: validatedParams.eventType,
+      timestamp: new Date().toISOString()
+    });
+    
+    const result = await processBusinessLogic(validatedParams);
+    
+    console.log(`[${requestId}] Processing completed`, {
+      duration: Date.now() - startTime
+    });
+    
+    return { 
+      statusCode: 200, 
+      body: result,
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Request-ID': requestId
+      }
+    };
+  } catch (error) {
+    console.error(`[${requestId}] Processing failed`, {
+      error: error.message,
+      duration: Date.now() - startTime,
+      timestamp: new Date().toISOString()
+    });
+    
+    return { 
+      statusCode: error.statusCode || 500, 
+      body: { 
+        error: error.statusCode ? error.message : 'Internal server error',
+        requestId: requestId
+      }
+    };
+  }
+}
+```
+
+## Monitoring & Observability
+
+### Application Performance Monitoring
+
+* **Real-time Metrics:** Track execution time, memory usage, and throughput
+* **Error Rate Monitoring:** Monitor and alert on error rates and failure patterns
+* **External API Monitoring:** Track external service response times and availability
+* **Business Metrics:** Monitor business-specific KPIs like sync success rates
+
+### Security Monitoring
+
+* **Authentication Failures:** Monitor and alert on authentication failures
+* **Input Validation Failures:** Track and investigate input validation rejections
+* **Rate Limiting Events:** Monitor rate limiting triggers
+* **Event Signature Failures:** Alert on webhook signature validation failures
+
+### Logging Standards
+
+* **Structured Logging:** Use JSON format for all logs
+* **Log Levels:** Implement appropriate log levels (ERROR, WARN, INFO, DEBUG)
+* **Correlation IDs:** Include request/correlation IDs in all related log entries
+* **Security Event Logging:** Log all security-relevant events without exposing sensitive data
+
+This comprehensive approach ensures that all generated code meets the highest standards for security, performance, and quality while providing educational value to help developers understand implementation decisions.

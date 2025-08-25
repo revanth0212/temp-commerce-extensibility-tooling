@@ -1,0 +1,154 @@
+---
+alwaysApply: true
+---
+# Claude Extension Agent - Interactive Protocol & Development Workflow
+
+## The Integration Starter Kit
+
+This is the mandatory starting point for building back-office integrations.
+
+### Purpose
+
+The Integration Starter Kit is a pre-built App Builder application template that provides a standardized architecture for synchronizing data between Adobe Commerce and external systems. It is not merely a suggestion; it is a prescriptive framework that embodies Adobe's best practices.
+
+### Architectural Contract
+
+The kit's directory structure is a blueprint for generated code. User requests must be interpreted as tasks to populate the correct parts of this structure:
+
+* **/actions/\<entity\>/\<system\>/\<event\>:** Core structure. For example, logic to handle a new customer created in Commerce and send it to an external system belongs in /actions/customer/commerce/created/.
+* **index.js:** The main entry point for an action.
+* **validator.js:** Logic to validate the incoming event payload.
+* **transformer.js:** Logic to transform the payload from the source format (e.g., Commerce event) to the target format (e.g., external CRM API).
+* **sender.js:** Logic to send the transformed payload to the target system's API.
+
+### Event Configuration Management (CRITICAL)
+
+The Integration Starter Kit includes several configuration files that define event subscriptions and metadata. These files **must** be updated whenever implementing new event handlers:
+
+#### Configuration Files Structure
+```
+scripts/
+├── commerce-event-subscribe/
+│   └── config/
+│       └── commerce-event-subscribe.json     # Event subscription definitions
+└── onboarding/
+    └── config/
+        ├── events.json                       # Event metadata and sample templates
+        ├── providers.json                    # Event provider definitions
+        └── starter-kit-registrations.json   # Entity-to-provider mappings
+```
+
+## Operational Protocol (Five-Phase Interaction Model)
+
+Follow this structured, multi-phase process for every user request. Do not deviate.
+
+### Phase 1: Requirements Documentation (Priority Action)
+
+Before any other action:
+
+1. **Check for REQUIREMENTS.md** file in the project root (same level as README.md)
+2. **If REQUIREMENTS.md exists:** 
+   - Read and parse the requirements as the source of truth
+   - Validate user request against documented requirements
+   - Note any conflicts or additions needed
+3. **If REQUIREMENTS.md is missing:** 
+   - Proceed to gather requirements through clarification questions
+   - Create the file with standardized structure after gathering information
+
+### Phase 2: Requirement Analysis & Clarification (Interactive)
+
+**When gathering requirements** (if file is missing or incomplete), ask the following clarifying questions:
+
+* **Critical Question #1 (Target Environment):** "Is this extension intended for **Adobe Commerce PaaS**, **SaaS**, or must it be **compatible with both**?"
+
+* **Critical Question #2 (Triggering Mechanism):** "What specific **Adobe Commerce event(s)** should trigger this extension's logic? Please provide the event name (e.g., sales_order_shipment_save_after, customer_save_after)."
+
+* **Critical Question #3 (External System Integration):** "If this extension integrates with a third-party system, please provide the following details for the target API:
+  * The full API endpoint URL.
+  * The authentication method (e.g., API Key, OAuth 2.0).
+  * A sample of the expected request payload format (JSON)."
+
+* **Critical Question #4 (Data Flow Direction):** "Is the data flow from Commerce to the external system, from the external system to Commerce, or bidirectional?"
+
+* **Critical Question #5 (Application Type):** "Should this be a **headless application** (backend-only Runtime actions for integrations) or a **Single Page Application** (SPA with both frontend UI and backend actions)?"
+
+* **Critical Question #6 (State Requirements):** "Does this extension need to maintain state between executions, cache frequently accessed data, or track processing status?"
+
+* **Critical Question #7 (Testing Preference):** "Would you like me to generate comprehensive test coverage, including unit tests, integration tests, and API tests?"
+
+**After gathering requirements:** 
+- **Create or update REQUIREMENTS.md** with all collected information
+- **Present the file to the user** for review and approval before proceeding
+
+### Phase 3: Architectural Planning
+
+Present a comprehensive implementation plan including:
+
+* **Application Architecture**: Detail whether this will be a headless app or SPA, explaining the choice based on requirements
+* **Integration Starter Kit Structure**: Specify the exact directory structure that will be created
+* **Security Implementation**: Detail the IMS authentication flow and tenant isolation via Runtime namespaces
+* **State Management**: If applicable, explain what data will be stored, where, and TTL values
+* **Testing Strategy**: If requested, outline the testing approach with coverage areas
+* **Documentation Plan**: List the architectural diagrams and verification procedures
+
+### Phase 4: Implementation & Code Generation
+
+Generate code following the approved plan:
+
+* **File-by-file Implementation**: Create each file with detailed explanations
+* **Integration Starter Kit Compliance**: Follow the prescribed directory structure
+* **Security Best Practices**: Embed IMS authentication, input validation, and secure error handling
+* **Performance Optimization**: Implement async patterns and resource-efficient algorithms
+* **Configuration File Updates**: Update all relevant starter kit configuration files
+
+### Phase 5: Documentation & Verification
+
+Provide complete implementation package:
+
+* **Architectural Diagrams**: Mermaid diagrams showing event flow, data transformation, authentication, and security boundaries
+* **Setup Documentation**: Comprehensive README with prerequisites, configuration, setup, testing, and deployment
+* **Testing Procedures**: Unit test examples, integration testing approaches, local testing procedures
+* **Troubleshooting Guide**: Common issues, debugging techniques, performance monitoring
+* **Performance Guidelines**: Expected response times, scalability considerations, monitoring recommendations
+
+## Use Case Scenarios
+
+### Scenario 1: Customer Data Synchronization
+
+**Developer Request:** "I need to sync new customers to our CRM."
+
+**Claude Response:** 
+"I'll help you create a customer synchronization extension. Let me first check for a REQUIREMENTS.md file...
+
+I don't see a REQUIREMENTS.md file, so I'll gather the requirements first:
+
+1. **(Target Environment):** Is this for **Adobe Commerce PaaS**, **SaaS**, or **both**?
+2. **(Triggering Mechanism):** The most common event is `com.adobe.commerce.customer.created`. Is this correct?
+3. **(CRM Integration):** Please provide:
+   * CRM API endpoint URL
+   * Authentication method
+   * Expected JSON payload format
+4. **(Data Flow):** This appears to be Commerce→CRM. Should it also sync updates?
+5. **(Application Type):** This sounds like a **headless** integration. Correct?
+6. **(State Management):** Do you need to track sync status?
+7. **(Testing):** Would you like comprehensive test coverage?"
+
+## Integration with REQUIREMENTS.md
+
+### File Management Throughout Development
+
+* **Phase 1:** Check for and read existing REQUIREMENTS.md
+* **Phase 2:** Create or update REQUIREMENTS.md with gathered information
+* **Phase 3:** Reference specific requirement sections in architectural plan
+* **Phase 4:** Implement according to documented acceptance criteria
+* **Phase 5:** Validate implementation against requirements checklist
+
+### Cross-Reference Protocol
+
+Throughout development:
+1. **Reference requirements explicitly:** "Based on the requirements in REQUIREMENTS.md, section [X]..."
+2. **Validate compliance:** Ensure all generated code meets documented acceptance criteria
+3. **Flag conflicts:** If user requests contradict documented requirements, highlight the conflict
+4. **Maintain traceability:** Link implementation decisions back to specific requirements
+
+This protocol ensures every extension is built on a solid foundation of documented, validated requirements while maintaining the interactive approach that helps developers understand architectural decisions.

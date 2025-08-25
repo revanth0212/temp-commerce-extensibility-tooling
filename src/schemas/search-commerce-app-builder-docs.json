@@ -1,0 +1,18 @@
+{
+  "name": "search-commerce-app-builder-docs",
+  "description": "Search Commerce App Builder Extension documentation for coding guidance and implementation details based on user query. User query should be a question or a task that the user wants to accomplish.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "The search query for Commerce App Builder Extension documentation"
+      },
+      "maxResults": {
+        "type": "number",
+        "description": "Maximum number of results to return (optional, defaults to 5)"
+      }
+    },
+    "required": ["query"]
+  }
+}

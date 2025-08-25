@@ -1,0 +1,15 @@
+{
+  "name": "onboard",
+  "description": "Run npm run onboard to configure Adobe I/O event providers and the Adobe I/O Events for Commerce module. This script creates event providers, registers event metadata, creates event registrations, and configures the Commerce Events module. It handles authentication, provider creation, and Commerce integration setup.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output (optional, default: false)",
+        "default": false
+      }
+    },
+    "required": []
+  }
+} 

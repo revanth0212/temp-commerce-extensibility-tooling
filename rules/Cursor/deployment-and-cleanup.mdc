@@ -1,0 +1,300 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - Cleanup & Deployment Readiness
+
+## Code Cleanup & Optimization Protocol
+
+Before deployment, ensure production-ready code through systematic cleanup and optimization. Always confirm with the user before performing cleanup operations.
+
+### When to Initiate Cleanup
+
+* **User requests deployment** via `aio app deploy` or similar commands
+* **User explicitly asks for code cleanup** or optimization
+* **Phase 4 completion** in the Integration Starter Kit workflow
+* **Before production deployment** to staging or live environments
+
+### Pre-Deployment Readiness Check
+
+When a user requests deployment, always perform this readiness assessment:
+
+```
+"Before we proceed with deployment, I recommend ensuring your code is production-ready. Would you like me to:
+
+1. **Add comprehensive test coverage** (if not already implemented)?
+2. **Clean up unnecessary code** including unused actions, dependencies, and configuration?
+3. **Optimize performance** and review security configurations?
+
+This will ensure a robust, maintainable deployment. Should I proceed with these optimizations, or would you prefer to deploy as-is?"
+```
+
+**Based on user response:**
+- **"Yes, optimize first"**: Proceed with cleanup protocol
+- **"No, deploy as-is"**: Proceed with deployment but include cleanup recommendations in post-deployment summary
+- **"Just tests" or "Just cleanup"**: Perform only requested optimizations
+
+## Cleanup Categories & Procedures
+
+### 1. Unused Actions & Event Handlers
+
+**Check for:**
+- Actions that were created during development but are no longer referenced
+- Event handlers for events that are no longer subscribed to
+- Duplicate or test actions in the `/actions` directory structure
+
+**Cleanup Process:**
+```javascript
+// Always confirm before cleanup
+"I've identified the following potentially unused actions:
+- /actions/customer/test/debug-handler (appears to be for testing)
+- /actions/order/legacy/old-processor (replaced by new implementation)
+
+Should I remove these unused actions? This will:
+✅ Reduce deployment size
+✅ Eliminate potential security risks
+✅ Simplify maintenance
+
+Confirm removal? (yes/no)"
+```
+
+### 2. Dependencies & Package Optimization
+
+**Review and clean:**
+- Unused npm dependencies in `package.json`
+- Development-only dependencies mistakenly included in production
+- Outdated packages with security vulnerabilities
+- Redundant or conflicting dependency versions
+
+**Cleanup Commands:**
+```bash
+# Audit and clean dependencies
+npm audit fix
+npm prune --production
+npm outdated  # Review for updates
+
+# Remove unused dependencies (after confirmation)
+npm uninstall unused-package-1 unused-package-2
+```
+
+### 3. Configuration & Manifest Cleanup
+
+**Clean up `manifest.yml`:**
+- Remove unused action definitions
+- Clean up unused environment variables and parameters
+- Remove test-only configurations
+- Optimize runtime settings for production
+
+**Clean up `app.config.yaml`:**
+- Remove development-only hooks and scripts
+- Clean up unused service configurations
+- Optimize for production deployment
+
+### 4. Environment & Credential Cleanup
+
+**Review and organize:**
+- Remove test credentials and API keys
+- Ensure production credentials are properly configured
+- Clean up unused environment variables
+- Verify credential isolation between environments
+
+**Security cleanup checklist:**
+```yaml
+# Remove from manifest.yml (after user confirmation)
+actions:
+  test-action:  # ← Remove test actions
+    function: test/debug.js
+    inputs:
+      DEBUG_MODE: true  # ← Remove debug configurations
+      TEST_API_KEY: $TEST_API_KEY  # ← Remove test credentials
+```
+
+### 5. Event Subscription Cleanup
+
+**Review Adobe I/O Events configuration:**
+- Remove unused event subscriptions
+- Clean up test event registrations
+- Verify event provider configurations
+- Remove development-only webhooks
+
+**Cleanup Process:**
+```bash
+# List current subscriptions (review with user)
+aio events subscription list
+
+# Remove unused subscriptions (after confirmation)
+aio events subscription delete --subscription-id unused-sub-123
+```
+
+## Code Quality & Performance Optimization
+
+### 1. Code Structure Optimization
+
+**Review and optimize:**
+- Consolidate duplicate validation logic
+- Optimize data transformation pipelines
+- Remove redundant error handling
+- Standardize logging and monitoring
+
+### 2. Performance Optimizations
+
+**Common optimizations:**
+- Optimize external API call patterns
+- Implement efficient caching strategies
+- Reduce action cold start times
+- Optimize payload processing
+
+### 3. Security Hardening
+
+**Final security review:**
+- Verify all input validation is comprehensive
+- Ensure proper error handling without information leakage
+- Confirm secure credential management
+- Validate webhook signature verification
+
+## Deployment Readiness Verification
+
+### Pre-Deployment Checklist
+
+Before proceeding with `aio app deploy`, verify:
+
+```
+✅ **Code Quality**
+  - [ ] No unused actions or handlers
+  - [ ] Dependencies are optimized and secure
+  - [ ] Configuration is production-ready
+  - [ ] Logging is appropriate for production
+
+✅ **Security**
+  - [ ] All webhooks have signature validation
+  - [ ] Credentials are properly managed via default parameters
+  - [ ] Input validation is comprehensive
+  - [ ] Error handling doesn't leak sensitive information
+
+✅ **Testing** (if implemented)
+  - [ ] All tests pass
+  - [ ] Event flow testing completed
+  - [ ] Security tests validate webhook protection
+  - [ ] Performance tests meet requirements
+
+✅ **Configuration**
+  - [ ] Environment-specific settings are correct
+  - [ ] Event subscriptions match requirements
+  - [ ] External system integrations are verified
+  - [ ] Monitoring and logging are configured
+
+✅ **Documentation**
+  - [ ] README files are updated
+  - [ ] Architecture diagrams are current
+  - [ ] Deployment instructions are complete
+  - [ ] Troubleshooting guides are included
+```
+
+## Interactive Cleanup Workflow
+
+### Step 1: Analysis & Recommendation
+
+```
+"I've analyzed your App Builder application and identified the following cleanup opportunities:
+
+🧹 **Code Cleanup**
+- 3 unused test actions that can be removed
+- 2 development dependencies that should be moved to devDependencies
+- 1 duplicate validation function that can be consolidated
+
+🔧 **Configuration Optimization**
+- 4 unused environment variables in manifest.yml
+- 2 test event subscriptions that can be removed
+- Development logging levels should be adjusted for production
+
+📊 **Performance Improvements**
+- API call batching can be optimized in transformer.js
+- Caching strategy can be improved for external lookups
+
+Would you like me to proceed with these optimizations? I'll confirm each major change before applying it."
+```
+
+### Step 2: User Confirmation & Execution
+
+**For each cleanup category, confirm before proceeding:**
+
+```
+"Removing unused action: /actions/debug/test-handler
+This action appears to be for development testing only and is not referenced in any event subscriptions.
+
+Proceed with removal? (yes/no)"
+```
+
+### Step 3: Cleanup Execution & Verification
+
+**After each cleanup operation:**
+```
+"✅ Removed unused action: /actions/debug/test-handler
+✅ Updated manifest.yml to remove test configurations
+✅ Cleaned up 2 unused dependencies
+
+Verifying application integrity..."
+
+# Run verification tests
+aio app test  # If tests exist
+aio app validate  # Check configuration validity
+```
+
+## Post-Cleanup Deployment
+
+### Optimized Deployment Process
+
+After cleanup, guide the deployment:
+
+```bash
+# 1. Final verification
+aio app validate
+
+# 2. Run tests (if implemented)
+aio app test
+
+# 3. Deploy with MCP tools (preferred)
+# Use aio-app-deploy MCP tool for seamless deployment
+
+# 4. Verify deployment
+aio app logs --tail
+```
+
+### Post-Deployment Verification
+
+**Verify production functionality:**
+- Test event flow from Commerce to external systems
+- Monitor initial event processing
+- Verify external system integrations
+- Check performance and error rates
+
+## Summary Template for Integration Starter Kit
+
+Include this cleanup guidance in Phase 4 summaries:
+
+```
+## 🚀 Deployment Readiness
+
+Your App Builder integration is functionally complete. Before production deployment, consider these optimization steps:
+
+### 📋 **Cleanup Checklist**
+- [ ] **Remove test/debug actions**: Clean up development-only code
+- [ ] **Optimize dependencies**: Remove unused packages and update security
+- [ ] **Production configuration**: Review manifest.yml and app.config.yaml
+- [ ] **Event subscription cleanup**: Remove test subscriptions and verify production events
+- [ ] **Security validation**: Verify webhook signatures and credential management
+
+### 🧪 **Testing Recommendations**
+- [ ] **Event flow testing**: Verify complete Commerce → App Builder → External System flow
+- [ ] **Security testing**: Test webhook signature validation and input sanitization  
+- [ ] **Performance testing**: Validate action execution times and external API response handling
+- [ ] **Error handling testing**: Test retry logic and failure scenarios
+
+### 🔧 **Performance Optimization**
+- [ ] **API call optimization**: Review external system integration patterns
+- [ ] **Caching strategy**: Implement appropriate caching for frequently accessed data
+- [ ] **Logging optimization**: Ensure production-appropriate logging levels
+
+**Ready to deploy?** Run the cleanup protocol first for production-ready code, or proceed directly if you prefer to optimize post-deployment.
+```
+
+This protocol ensures production deployments are optimized, secure, and maintainable while always respecting user preferences and confirming major changes before execution.

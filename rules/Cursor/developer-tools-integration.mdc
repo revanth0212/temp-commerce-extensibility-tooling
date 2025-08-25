@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - MCP Tools Integration
+
+## Adobe I/O MCP Server Integration
+
+When available, prefer using the Adobe I/O MCP Server tools for seamless development workflow within the coding environment. The MCP server provides Adobe I/O CLI tools for deployment and management of Adobe Developer App Builder applications.
+
+## Available MCP Tools
+
+### Core Development Tools
+- **`aio-app-deploy`**: Deploy Adobe I/O applications to runtime with various deployment options
+- **`aio-app-dev`**: Start local development server for Adobe I/O applications with hot reload
+- **`aio-dev-invoke`**: Invoke runtime actions running locally via aio app dev for testing
+
+### Authentication & Configuration
+- **`aio-login`**: Authenticate with Adobe I/O services using OAuth2 flow
+- **`aio-where`**: Show current Adobe I/O configuration (org, project, workspace)
+- **`aio-app-use`**: Configure runtime namespace for the current project
+- **`aio-configure-global`**: Manage global Adobe I/O configuration (orgs, projects, workspaces)
+
+### Commerce Integration Tools
+- **`aio-onboard`**: Configure Adobe I/O event providers and Commerce Events module
+- **`aio-commerce-event-subscribe`**: Subscribe to Commerce events for product and customer changes
+
+## MCP Tools Usage Guidelines
+
+### When to Use MCP Tools
+- **During development workflow**: Use MCP tools when they provide the same functionality as manual CLI commands
+- **For seamless integration**: Prefer MCP tools for actions that can be executed within the coding environment
+- **Authentication setup**: Use `aio-login` for initial authentication rather than manual CLI
+- **Deployment operations**: Use `aio-app-deploy` for deploying applications to runtime
+- **Local testing**: Use `aio-app-dev` and `aio-dev-invoke` for local development and testing
+
+### Integration with Development Phases
+
+#### Phase 1: Setup & Authentication
+- Use `aio-login` for authentication setup
+- Use `aio-configure-global` to manage org/project/workspace selection
+- Use `aio-where` to verify current configuration
+
+#### Phase 2: Development
+- Use `aio-app-dev` to start local development server
+- Use `aio-dev-invoke` to test actions locally during development
+
+#### Phase 3: Deployment
+- Use `aio-app-deploy` to deploy applications to runtime
+- Use `aio-app-use` to configure runtime namespace if needed
+
+#### Phase 4: Commerce Integration
+- Use `aio-onboard` for initial Commerce integration setup
+- Use `aio-commerce-event-subscribe` for Commerce event subscriptions
+
+## MCP Tools Capabilities
+
+### Deployment Features
+- Deploy specific actions or entire applications
+- Skip build phase or force rebuild options
+- Skip deployment of web assets or actions selectively
+- Force deploy even when no changes detected
+- Verbose output for debugging deployment issues
+
+### Development Features
+- Start local development servers with hot reload
+- Test runtime actions locally before deployment
+- Invoke actions with custom parameters and HTTP methods
+- Discover available actions automatically
+
+### Configuration Features
+- List and select Adobe organizations, projects, and workspaces
+- Manage global configuration settings
+- Configure runtime namespaces for proper tenant isolation
+- Handle authentication flows seamlessly
+
+### Commerce Integration Features
+- Configure Adobe I/O event providers for Commerce
+- Set up Commerce Events module integration
+- Create event registrations and metadata
+- Subscribe to Commerce events (product, customer, order operations)
+- Handle Commerce OAuth1 authentication for event subscriptions
+
+## Tool Integration Best Practices
+
+- **Always offer MCP tools** when available as alternatives to manual CLI commands
+- **Document MCP usage** in implementation guides and README files
+- **Prefer MCP tools** for repetitive tasks and workflow automation
+- **Use verbose flags** when debugging issues with MCP tools
+- **Combine tools effectively** for complete development workflows

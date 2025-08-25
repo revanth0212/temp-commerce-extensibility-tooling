@@ -1,0 +1,117 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - App Builder Framework & Architecture
+
+## The Adobe Developer App Builder Framework
+
+This is your primary toolset. App Builder is a complete, serverless framework for building custom applications that extend Adobe Experience Cloud solutions, built on modern JAMStack architecture (JavaScript, APIs, and Markup).
+
+### JAMStack Foundation
+
+App Builder is built on JAMStack principles, removing the need for tightly coupled web servers. Instead, it focuses on a client + services model where static assets are served from a CDN and JavaScript interacts directly with services via APIs. This architecture provides better performance, higher security, easier scaling, and better developer experience.
+
+### Application Types
+
+App Builder supports two primary application patterns:
+* **Single Page Applications (SPAs):** Front-end and back-end code developed together but deployed separately. Front-end becomes static assets served via CDN, back-end becomes Runtime actions.
+* **Headless Applications:** Microservices deployed only to I/O Runtime without front-end components, perfect for backend integrations and event-driven workflows.
+
+### Core Components
+
+* **Adobe I/O Runtime:** Adobe's serverless platform (based on Apache OpenWhisk) where your generated backend logic (called "actions") is hosted and executed. Each action runs in its own isolated container with full internet access but strict tenant isolation.
+* **Adobe I/O Events & Webhooks:** These are the primary mechanisms for communication. Commerce emits events (e.g., customer_save_after), which trigger your App Builder actions asynchronously. Webhooks are used for synchronous interactions.
+* **API Mesh:** An API orchestration layer. Use it to combine multiple API sources (e.g., Commerce GraphQL, a third-party REST API, and another App Builder action) into a single, high-performance GraphQL endpoint. This is crucial for optimizing front-end performance and simplifying data fetching.
+* **Developer Tools:** The aio Command-Line Interface (CLI), various SDKs, debugger, and the Adobe Developer Console are used to create, manage, deploy, and monitor App Builder applications.
+
+### Essential Commands
+
+* **`aio app dev`**: Starts local development server with hot reload - use during development for testing actions locally
+* **`aio app deploy`**: Deploys application to Adobe I/O Runtime - use when ready to deploy to staging/production
+* **`aio app logs`**: Streams real-time action logs - use for debugging runtime issues and monitoring execution
+* **`aio app test`**: Runs application tests - use to validate functionality before deployment
+* **`aio app undeploy`**: Removes deployed application - use for cleanup or rollback scenarios
+* **MCP Integration:** When available, suggest using integrated MCP tools (aio-app-dev, aio-app-deploy, aio-login, aio-where) for seamless development workflow within the coding environment
+
+### UI Framework
+
+For extensions that require a user interface within the Commerce Admin, you will use **React Spectrum**, Adobe's UI component library, to ensure a consistent look and feel.
+
+### Storage & CI/CD
+
+* **Storage:** App Builder provides built-in key-value storage and file storage for your applications with strict tenant isolation.
+* **CI/CD Support:** Sample GitHub Actions for automated deployment pipelines.
+
+## Security Architecture
+
+App Builder implements comprehensive security through:
+* **Adobe Identity Management Services (IMS):** Central authentication system handling all user access via OAuth 2.0 and JWT tokens
+* **Tenant Isolation:** Multi-level isolation through Enterprise Organization → Project → Workspace → Runtime Namespace hierarchy
+* **Container Security:** Each action runs in isolated containers that may be reused for the same action but never shared across applications
+* **Access Controls:** Users must have Experience Cloud org membership AND access to all Adobe apps used by the App Builder application
+
+## Application State Management (CRITICAL)
+
+App Builder provides comprehensive state management capabilities that are essential for building robust extensions. Understanding when and how to use these is fundamental to your generated solutions.
+
+### State vs Files Storage
+
+* **State:** Use for fast access (latency oriented), data smaller than 100KB, and when you need TTL (time-to-live) functionality. State supports key-value operations with configurable expiration (default 1 day, maximum 365 days).
+* **Files:** Use for large payloads (bandwidth oriented), data larger than 100KB, and when you need to share data via presigned URLs.
+
+### State Service Features
+
+* **Multi-tenant & Isolated:** Each application workspace has its own isolated data container
+* **Regional Options:** Choose between `amer` (US), `emea` (EU), or `apac` (Japan) regions for latency optimization and compliance
+* **Consistency:** Strong consistency for CRUD operations, eventual consistency for list operations
+* **Quotas:** Up to 10GB per App Builder pack, 1GB per production workspace, 200MB for other workspaces
+
+### When to Use State Management
+
+* Storing processing status or workflow state between action invocations
+* Caching frequently accessed data to improve performance
+* Managing temporary data with automatic cleanup via TTL
+* Storing user preferences or configuration data
+* Maintaining synchronization state between Commerce and external systems
+
+### Implementation Patterns
+
+* Always initialize state with explicit region selection for compliance requirements
+* Use descriptive keys with consistent naming patterns (e.g., `customer-sync-{customerId}-status`)
+* Set appropriate TTL values based on data lifecycle requirements
+* Implement proper error handling for rate limits (429) and storage limits (403)
+
+## App Builder Project Configuration (CRITICAL)
+
+Understanding App Builder project configuration is essential for generating properly structured and deployable extensions.
+
+### Project Structure
+
+App Builder projects follow a standardized structure that you must respect:
+* **app.config.yaml:** Central configuration file defining application metadata, dependencies, and deployment settings
+* **manifest.yaml:** Defines Runtime actions, their configurations, and default parameters for secure credential management
+* **.env:** Local development environment variables (never commit secrets here)
+* **actions/:** Directory containing all Runtime action code organized by entity/system/event pattern
+* **web-src/:** Directory for Single Page Application front-end code
+* **test/:** Directory for test files mirroring the actions structure
+
+### Configuration Management
+
+* **Workspace Isolation:** Each workspace has its own configuration and deployed resources
+* **Environment-Specific Config:** Use different configurations for development, staging, and production environments
+* **Credential Management:** Use manifest.yaml default parameters for secure secret storage, not .env files in production
+* **Runtime Namespace:** Each workspace maps to a unique Runtime namespace for tenant isolation
+
+### Deployment Patterns
+
+* **Headless Applications:** Deploy only Runtime actions for backend services and integrations
+* **Single Page Applications:** Deploy both Runtime actions (backend) and static assets (frontend) to CDN
+* **Hybrid Applications:** Combine SPA frontend with headless backend services for complex workflows
+
+### Configuration Best Practices
+
+* **Action Configuration:** Define proper limits, timeouts, and memory allocation for Runtime actions
+* **Package Organization:** Group related actions into packages for better management
+* **Environment Variables:** Use app.config.yaml for application-level configuration
+* **Default Parameters:** Leverage manifest.yaml default parameters for action-level configuration and secrets
+* **CI/CD Integration:** Configure for automated deployment pipelines using GitHub Actions or similar tools

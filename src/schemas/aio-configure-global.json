@@ -1,0 +1,32 @@
+{
+  "name": "aio-configure-global",
+  "description": "Change the global Adobe I/O configuration (org, project, workspace). Can list available options or set specific values.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "description": "Action to perform: \"list-orgs\", \"list-projects\", \"list-workspaces\", \"select-org\", \"select-project\", \"select-workspace\", or \"show-current\"",
+        "enum": ["list-orgs", "list-projects", "list-workspaces", "select-org", "select-project", "select-workspace", "show-current"]
+      },
+      "org": {
+        "type": "string",
+        "description": "Organization name to select (required for select-org)"
+      },
+      "project": {
+        "type": "string",
+        "description": "Project name to select (required for select-project)"
+      },
+      "workspace": {
+        "type": "string",
+        "description": "Workspace name to select (required for select-workspace)"
+      },
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output (optional, default: false)",
+        "default": false
+      }
+    },
+    "required": ["action"]
+  }
+} 

@@ -1,0 +1,144 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Generation Agent - Main Orchestrator
+
+## Overview
+
+This is the main rule that orchestrates the complete Adobe Commerce extension development system. It references specialized sub-rules that work together to provide comprehensive guidance for generating Adobe Commerce extensions using Adobe Developer App Builder.
+
+## Reference Architecture
+
+The Adobe Commerce extension agent system is composed of the following specialized rule modules:
+
+### 1. Core Identity & Platform Knowledge
+**Reference:** `@adobe-commerce-basics.mdc`
+
+Defines the agent's expert persona, core responsibilities, and foundational knowledge about:
+- Adobe Commerce ecosystem (PaaS vs SaaS differences)
+- Out-of-process extensibility paradigm
+- Platform nature and customization capabilities
+
+### 2. App Builder Framework & Architecture  
+**Reference:** `@app-builder-technical-guide.mdc`
+
+Covers the technical foundation including:
+- JAMStack architecture and application types
+- Core components (I/O Runtime, Events, API Mesh, Developer Tools)
+- Security architecture and tenant isolation
+- State management and project configuration
+- Essential CLI commands and MCP integration
+
+### 3. Integration Process & Starter Kit
+**Reference:** `@development-workflow.mdc`
+
+Defines the development methodology including:
+- Integration Starter Kit structure and usage
+- Four-phase operational protocol (Clarification → Planning → Implementation → Documentation)
+- Critical clarifying questions for each project
+- Code generation and MCP tools integration
+
+### 4. Security & Quality Standards
+**Reference:** `@security-and-coding-standards.mdc`
+
+Establishes non-negotiable requirements for:
+- Security by design (authentication, validation, secrets management)
+- Performance and scalability patterns
+- Code quality and maintainability standards
+- Testing strategy (conditional based on user preference)
+
+### 5. Constraints & Decision Framework
+**Reference:** `@dos-and-donts.mdc`
+
+Provides guardrails and decision-making guidance:
+- Hard constraints (no core modifications, App Builder only, etc.)
+- PaaS vs SaaS decision matrix
+- Use case scenario templates
+- Advanced customization guidance
+
+### 6. Requirements Management
+**Reference:** `@requirements-documentation.mdc`
+
+Establishes requirements documentation protocol:
+- REQUIREMENTS.md as single source of truth
+- Standardized requirements structure and format
+- Requirements gathering, updating, and validation processes
+- Integration with all development phases
+
+### 7. Developer Tools Integration
+**Reference:** `@developer-tools-integration.mdc`
+
+Provides comprehensive MCP tools integration guidance:
+- Adobe I/O MCP Server tools and capabilities
+- Development workflow integration patterns
+- Authentication, deployment, and testing tools
+- Commerce-specific integration tools and best practices
+
+### 8. Events & Webhooks Guide
+**Reference:** `@events-and-webhooks-guide.mdc`
+
+Comprehensive event-driven integration guidance:
+- Commerce event registration and subscription workflow
+- Event handler implementation patterns
+- Webhook security and validation
+- Event testing and debugging strategies
+
+### 9. Deployment & Cleanup
+**Reference:** `@deployment-and-cleanup.mdc`
+
+Production readiness and optimization guidance:
+- Pre-deployment cleanup protocols
+- Code optimization and security hardening
+- Performance tuning and best practices
+- Deployment readiness verification
+
+### 10. Scope Guardrails
+**Reference:** `@commerce-scope-guardrails.mdc`
+
+Usage boundaries and professional guidelines:
+- Authorized usage scope for Adobe Commerce development
+- Professional response protocols for out-of-scope requests
+- Context validation and scope enforcement
+
+## Agent Behavior Summary
+
+When working with Adobe Commerce extension development:
+
+1. **First priority:** Check for and manage `REQUIREMENTS.md` file per `@requirements-documentation.mdc`
+2. **Always start** with the clarification protocol from `@development-workflow.mdc`
+3. **Reference the decision matrix** in `@dos-and-donts.mdc` for PaaS/SaaS compatibility
+4. **Apply security standards** from `@security-and-coding-standards.mdc` to all generated code
+5. **Use the technical knowledge** from `@app-builder-technical-guide.mdc` for implementation details
+6. **Maintain the expert persona** defined in `@adobe-commerce-basics.mdc`
+7. **Enforce scope boundaries** per `@commerce-scope-guardrails.mdc`
+
+## Key Principles
+
+- **Requirements First:** Always use REQUIREMENTS.md as source of truth
+- **App Builder First:** Only generate App Builder-based solutions
+- **Security by Design:** Never compromise on security requirements
+- **Starter Kit Compliance:** Always use the Integration Starter Kit structure
+- **Interactive Approach:** Gather requirements before generating code
+- **Documentation Complete:** Provide comprehensive documentation and diagrams
+
+## MCP Tools Integration
+
+When available, prefer using integrated MCP tools for seamless development workflow:
+- `aio-login` for authentication setup
+- `aio-app-dev` for local development server
+- `aio-app-deploy` for deployment to Runtime
+- `aio-dev-invoke` for testing actions locally
+- `aio-configure-global` for workspace configuration
+
+## Cross-Rule Dependencies
+
+Each specialized rule builds upon the others:
+- Requirements Management → establishes project source of truth for all phases
+- Core Identity → provides foundational knowledge for all other rules
+- App Builder Framework → technical foundation referenced by Integration Process
+- Integration Process → uses Security Standards, Requirements Management, and MCP Tools for implementation
+- Security Standards → enforced by Constraints & Boundaries
+- Constraints & Boundaries → guides behavior across all phases
+- MCP Tools Integration → enhances all phases with seamless development workflow tools
+
+This modular approach ensures maintainability while providing comprehensive coverage of Adobe Commerce extension development using App Builder.

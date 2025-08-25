@@ -1,0 +1,186 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - Requirements Management
+
+## Requirements Documentation Protocol
+
+The agent must use a `REQUIREMENTS.md` file as the **single source of truth** for all extension development. This file serves as the canonical reference for acceptance criteria, expectations, and implementation details.
+
+## File Location and Structure
+
+### Location
+- **File Path:** `REQUIREMENTS.md` (at the project root level, same directory as `README.md`)
+- **Format:** Markdown format for easy readability and version control
+
+### Required Structure
+The `REQUIREMENTS.md` file must follow this standardized structure:
+
+```markdown
+# Extension Requirements
+
+## Project Overview
+- **Extension Name:** [Name of the extension]
+- **Target Environment:** [PaaS/SaaS/Both]
+- **Application Type:** [Headless/SPA/Hybrid]
+- **Last Updated:** [Date]
+
+## Business Requirements
+- [High-level business objectives]
+- [Success criteria]
+- [User stories or use cases]
+
+## Technical Requirements
+### Triggering Events
+- [List of Commerce events that trigger the extension]
+
+### External System Integration
+- **API Endpoint:** [Full URL]
+- **Authentication Method:** [API Key/OAuth 2.0/etc.]
+- **Expected Payload Format:** [JSON structure]
+
+### Data Flow
+- [Description of data flow direction and transformation]
+
+### State Management
+- [Requirements for state persistence, caching, TTL]
+
+## Acceptance Criteria
+- [ ] [Specific, testable criteria]
+- [ ] [Performance requirements]
+- [ ] [Security requirements]
+- [ ] [Error handling requirements]
+
+## Non-Functional Requirements
+### Security
+- [Specific security requirements]
+
+### Performance
+- [Performance benchmarks and expectations]
+
+### Monitoring & Logging
+- [Logging and monitoring requirements]
+
+## Testing Requirements
+- [Unit testing requirements]
+- [Integration testing requirements]
+- [API testing requirements]
+
+## Documentation Requirements
+- [Required documentation deliverables]
+- [Architectural diagrams needed]
+
+## Dependencies
+- [External systems]
+- [Adobe services]
+- [Third-party libraries]
+
+## Constraints and Assumptions
+- [Technical constraints]
+- [Business constraints]
+- [Assumptions made]
+
+## Change Log
+- [Track requirement changes with dates and reasons]
+```
+
+## Agent Behavior Protocol
+
+### 1. File Detection and Creation
+
+**At the start of every extension development session:**
+1. **Check for existence** of `REQUIREMENTS.md` in the project root
+2. **If file exists:** Read and parse the requirements as the source of truth
+3. **If file is missing:** Create the file using information gathered from user conversations
+
+### 2. Requirements Gathering
+
+**When REQUIREMENTS.md is missing:**
+1. Follow the standard clarification protocol from `@development-workflow.mdc`
+2. **Immediately after gathering requirements:** Create `REQUIREMENTS.md` with all collected information
+3. **Populate all sections** based on user responses and technical analysis
+4. **Present the file to the user** for review and approval before proceeding
+
+### 3. Requirements Updates
+
+**During development when new requirements emerge:**
+1. **Always update** `REQUIREMENTS.md` with new information
+2. **Document changes** in the Change Log section with date and reason
+3. **Notify the user** of requirements updates: "I've updated REQUIREMENTS.md to reflect the new [specific requirement]. Please review the changes."
+4. **Use the updated file** as the authoritative source for all subsequent decisions
+
+### 4. Cross-Reference Protocol
+
+**Throughout development:**
+1. **Reference requirements explicitly:** "Based on the requirements in REQUIREMENTS.md, section [X]..."
+2. **Validate compliance:** Ensure all generated code meets documented acceptance criteria
+3. **Flag conflicts:** If user requests contradict documented requirements, highlight the conflict and propose resolution
+4. **Maintain traceability:** Link implementation decisions back to specific requirements
+
+### 5. Requirements Validation
+
+**Before code generation:**
+1. **Verify completeness:** Ensure all required sections are populated
+2. **Check consistency:** Validate that requirements don't contradict each other
+3. **Confirm clarity:** Ensure requirements are specific and testable
+4. **Request clarification:** If requirements are vague or incomplete, ask for specific details
+
+## Integration with Development Phases
+
+### Phase 1: Requirement Analysis & Clarification
+- **First action:** Check for `REQUIREMENTS.md`
+- **If missing:** Create file with gathered requirements
+- **If present:** Review and validate against user request
+
+### Phase 2: Architectural Planning
+- **Base plan on documented requirements**
+- **Reference specific requirement sections in the plan**
+- **Highlight any gaps or assumptions**
+
+### Phase 3: Code Generation & Implementation
+- **Implement according to documented acceptance criteria**
+- **Ensure compliance with all technical requirements**
+- **Reference requirement IDs in code comments where applicable**
+
+### Phase 4: Documentation & Validation
+- **Update project documentation to reference REQUIREMENTS.md**
+- **Create acceptance criteria checklist based on requirements**
+- **Validate implementation against all documented criteria**
+
+## File Management Best Practices
+
+### Version Control
+- **Track changes:** Use meaningful commit messages when updating requirements
+- **Preserve history:** Maintain change log within the file
+- **Branch protection:** Treat requirements changes as significant modifications
+
+### Collaboration
+- **Single source:** All team members reference the same requirements file
+- **Change approval:** Significant requirement changes should be reviewed
+- **Stakeholder alignment:** Use file for stakeholder communication and sign-off
+
+### Quality Assurance
+- **Regular reviews:** Periodically review requirements for accuracy and completeness
+- **Test traceability:** Link test cases back to specific requirements
+- **Implementation validation:** Use requirements as checklist for completion
+
+## Error Handling
+
+### Missing Information
+- **Incomplete requirements:** Request specific details rather than making assumptions
+- **Conflicting requirements:** Document conflicts and seek resolution
+- **Unclear acceptance criteria:** Ask for measurable, testable criteria
+
+### File Corruption or Loss
+- **Backup strategy:** Recommend version control for requirements file
+- **Recovery protocol:** Recreate from conversation history and user input
+- **Validation process:** Review recreated requirements with user before proceeding
+
+## Success Metrics
+
+The requirements management system is successful when:
+- **Consistency:** All implementation decisions trace back to documented requirements
+- **Completeness:** No functionality is implemented without corresponding requirements
+- **Clarity:** Requirements are specific, measurable, and testable
+- **Traceability:** Clear relationship between requirements and implementation
+- **Maintainability:** Requirements file evolves appropriately with project needs

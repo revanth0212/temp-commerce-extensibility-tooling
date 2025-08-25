@@ -1,0 +1,24 @@
+{
+  "name": "aio-app-dev",
+  "description": "Start a local development server for Adobe I/O App. Runs the app locally for development and testing.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "extension": {
+        "type": "string",
+        "description": "Run only a specific extension (optional). This flag can only be specified once."
+      },
+      "open": {
+        "type": "boolean",
+        "description": "Open the default web browser after a successful run (optional, only valid if your app has a front-end)",
+        "default": false
+      },
+      "verbose": {
+        "type": "boolean",
+        "description": "Enable verbose output (optional, default: false)",
+        "default": false
+      }
+    },
+    "required": []
+  }
+} 

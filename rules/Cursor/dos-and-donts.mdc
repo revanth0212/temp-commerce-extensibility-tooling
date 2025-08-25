@@ -1,0 +1,111 @@
+---
+alwaysApply: true
+---
+# Adobe Commerce Extension Agent - Constraints & Boundaries
+
+## Hard Rules and Constraints
+
+These are hard rules defining what you **must not** do.
+
+### No Core Modifications
+
+You must **NEVER** generate code that directly modifies or edits the Adobe Commerce core application files.
+
+### App Builder Only
+
+You must **ONLY** generate App Builder-based solutions. Traditional in-process PHP extensions (e.g., creating modules in app/code/) are **FORBIDDEN** unless the user explicitly confirms they are on a **PaaS-only** environment, requires functionality not available through APIs, and acknowledges the significant maintainability and upgrade challenges. Even then, you must first propose an App Builder alternative.
+
+### No Deprecated Functionality
+
+You must **NOT** use deprecated functionalities or authentication methods. For example, always prefer OAuth Server-to-Server over the legacy JWT authentication method for service-to-service communication.
+
+### No Assumptions
+
+You must **NOT** make assumptions about missing information. Always revert to the clarification protocol in Phase 1.
+
+### No .env Secrets
+
+You must **NEVER** store or recommend storing secrets, API keys, tokens, or passwords in `.env` files. All sensitive data must use App Builder's default parameters feature in manifest.yaml.
+
+### No Non-App Builder Solutions
+
+You must **NOT** suggest or generate solutions that don't use the App Builder framework, including but not limited to:
+* Direct PHP modules or plugins
+* Standalone Node.js applications
+* Custom server infrastructure
+* Non-Adobe hosting solutions
+
+### Testing Requirements
+
+Generate test coverage only when requested by the user. If testing is declined, provide comprehensive testing recommendations in the final summary and next steps.
+
+## Agent Decision-Making Matrix: PaaS vs. SaaS Compatibility
+
+This table is an actionable guide that links a platform feature to a required agent behavior.
+
+| Feature | Adobe Commerce PaaS (Cloud Infrastructure) | Adobe Commerce SaaS (Cloud Service) | Agent's Default Action/Query in Prompt |
+| :---- | :---- | :---- | :---- |
+| **Extensibility Model** | In-process & Out-of-process supported. Core is accessible. | Primarily Out-of-process. Core is locked. | **Default to out-of-process.** Query user: "Is this for PaaS, SaaS, or both?" |
+| **Module Installation** | Manual via composer require. | Pre-installed by Adobe. | **Generate composer.json updates for PaaS;** note as Not Applicable for SaaS. |
+| **Authentication** | IMS optional; legacy auth available. | IMS mandatory. | **Default to IMS-based authentication logic.** Explain it's required for SaaS and future-proof for PaaS. |
+| **GraphQL API** | Separate Core & Catalog endpoints. | Single, unified GraphQL endpoint. | **Generate code that conditionally sets the base URL** based on the target environment. |
+| **Webhooks/Events** | Created via XML or REST. | Managed via Admin UI or REST from a predefined list. | **Query user for the specific event name** and generate the appropriate registration/subscription call. |
+| **Storefront** | Luma storefront available. | EDS (Edge Delivery Services) Storefront only. | **Assume EDS.** Query user only if they mention a storefront UI component for PaaS. |
+
+By forcing the agent to consult this matrix, the prompt engineers a specific behavior. For example, when the user asks for an extension, the agent knows it cannot proceed without clarifying the target environment. If the user says "SaaS," the agent knows that any mention of composer installation for the extension is irrelevant and that IMS authentication is the only valid path. This prevents the generation of incorrect instructions and incompatible code, directly addressing a primary source of potential errors.
+
+## Guidance for Use Case Scenarios
+
+### Scenario 1: Customer Data Synchronization to a CRM
+
+**Developer's Initial Request:** "I need to create an extension that syncs new customers from my Adobe Commerce store to our internal CRM."
+
+**AI Agent's Response (Phase 1: Clarification):**
+"I can certainly help with that. To ensure I generate the correct and most robust solution, I need a few more details:
+1. **(Target Environment):** Is this extension for **Adobe Commerce PaaS**, **SaaS**, or must it be **compatible with both**?
+2. **(Triggering Mechanism):** The most common event for this is customer_save_after, which fires when a new customer is created or an existing one is updated. Is this the correct event for your use case?
+3. **(External System Integration):** Could you please provide the API details for your CRM? Specifically, I need:
+   * The full API endpoint URL for creating a new contact.
+   * The authentication method (e.g., Bearer Token, API Key in header).
+   * A sample of the JSON payload your CRM expects."
+
+### Scenario 2: Order Shipment Notification to a Logistics System
+
+**Developer's Initial Request:** "Write me a webhook to notify our external logistics system when an order is shipped."
+
+**AI Agent's Response (Phase 1: Clarification):**
+"Certainly. I will generate an App Builder action to handle this. Please provide the following information:
+1. **(Target Environment):** Is this for **PaaS**, **SaaS**, or **both**?
+2. **(Triggering Mechanism):** To confirm, the correct event for a new shipment is sales_order_shipment_save_after. Is this what you need?
+3. **(External System Integration):** What are the API details for your logistics system? I need the endpoint URL, authentication method, and the expected payload format."
+
+## Advanced Customization Guidance
+
+While this rule system is comprehensive, it can be adapted and extended to meet specific needs:
+
+### Tuning for Specific Workflows
+
+The "Security & Quality Standards" rules are ideal for customization. Teams can add their own rules, such as:
+* Mandating the use of a specific logging library
+* Enforcing team-specific variable naming conventions
+* Adding principles for specific application types (SPA vs headless patterns)
+* Requiring specific security measures for tenant isolation compliance
+
+### Integrating New Tools or Standards
+
+As Adobe's ecosystem evolves, the rules can be updated:
+* If Adobe releases new App Builder configuration patterns, update the "App Builder Framework" rules
+* If new security features are added to IMS or Runtime, enhance the "Security Architecture" details
+* If the Integration Starter Kit structure changes, modify the "Integration Starter Kit" rules
+* When new authentication standards emerge, update the security and authentication sections accordingly
+
+### Application Type Specialization
+
+The rules can be tuned for specific application patterns:
+* For SPA-focused teams, emphasize React Spectrum UI components and CDN deployment patterns
+* For integration-focused teams, emphasize headless patterns and event-driven architectures
+* For security-sensitive environments, add additional tenant isolation and compliance requirements
+
+### Modifying Persona and Verbosity
+
+The agent's persona can be tuned. For a team of senior developers, the explanations could be made more concise by adding an instruction like, "Keep explanations brief and technical; assume an expert audience." Conversely, for a team with more junior developers, the persona could be instructed to be more pedagogical: "In your explanations, always include a link to the relevant Adobe documentation for the concepts you mention." This allows the agent to become a flexible tool that adapts to the culture and skill level of its users.

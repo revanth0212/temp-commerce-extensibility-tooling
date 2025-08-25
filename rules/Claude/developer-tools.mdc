@@ -1,0 +1,212 @@
+---
+alwaysApply: true
+---
+# Claude Extension Agent - Developer Tools Integration
+
+## Adobe I/O CLI Integration
+
+When working with Adobe Commerce extension development, Claude can leverage CLI tools to streamline the development workflow. These tools provide seamless integration for authentication, deployment, and testing.
+
+## Core Development Tools
+
+### Application Management
+- **`aio app deploy`**: Deploy Adobe I/O applications to runtime with various deployment options
+- **`aio app dev`**: Start local development server for Adobe I/O applications with hot reload
+- **`aio app undeploy`**: Remove applications from runtime for cleanup
+- **`aio app logs`**: View real-time logs for debugging and monitoring
+
+### Local Development & Testing
+- **`aio app test`**: Run comprehensive test suites if configured
+- **`aio app init`**: Initialize new App Builder projects from templates
+
+### Action Testing
+- **Local Invocation**: Test actions locally during development
+- **Parameter Testing**: Test actions with custom parameters and HTTP methods
+- **Action Discovery**: Automatically discover available actions in the project
+
+## Authentication & Configuration
+
+### Authentication Tools
+- **`aio login`**: Authenticate with Adobe I/O services using OAuth2 flow
+- **Context Management**: Handle different Adobe IMS contexts for various environments
+
+### Configuration Management
+- **`aio where`**: Show current Adobe I/O configuration (org, project, workspace)
+- **`aio app use`**: Configure runtime namespace for the current project
+- **Global Configuration**: Manage global Adobe I/O configuration (orgs, projects, workspaces)
+
+### Organization & Project Management
+- **List Organizations**: View available Adobe organizations
+- **List Projects**: View projects within selected organization
+- **List Workspaces**: View workspaces within selected project
+- **Selection Tools**: Select specific org, project, or workspace for development
+
+## Commerce Integration Tools
+
+### Event Provider Configuration
+- **Provider Setup**: Configure Adobe I/O event providers for Commerce
+- **Commerce Events Module**: Set up Commerce Events module integration
+- **Event Registration**: Create event registrations and metadata
+- **Event Metadata Management**: Configure event types and templates
+
+### Commerce Event Subscription
+- **Event Subscription**: Subscribe to Commerce events for product and customer changes
+- **Event Filtering**: Configure which events and fields to subscribe to
+- **Subscription Management**: Manage existing event subscriptions
+
+## Integration with Development Phases
+
+### Phase 1: Setup & Authentication
+When starting a new project or development session:
+
+```bash
+# Authenticate with Adobe I/O
+aio login
+
+# Verify current configuration
+aio where
+
+# Configure global settings if needed
+# (List and select org, project, workspace)
+```
+
+### Phase 2: Development Environment Setup
+During development setup:
+
+```bash
+# Configure runtime namespace
+aio app use
+
+# Start local development server
+aio app dev
+
+# Test actions locally (in separate terminal)
+# Test with custom parameters and methods
+```
+
+### Phase 3: Implementation & Testing
+During code implementation:
+
+```bash
+# Test specific actions locally
+# Invoke actions with various parameters
+# Monitor logs for debugging
+
+# View real-time logs
+aio app logs
+```
+
+### Phase 4: Commerce Integration Setup
+For Commerce-specific integrations:
+
+```bash
+# Configure event providers and Commerce integration
+# This sets up the necessary event infrastructure
+
+# Subscribe to Commerce events
+# Configure event subscriptions for the extension
+```
+
+### Phase 5: Deployment
+For production deployment:
+
+```bash
+# Deploy the complete application
+aio app deploy
+
+# Deploy specific actions only (during development)
+aio app deploy --action packageName/actionName
+
+# Force deployment even if no changes detected
+aio app deploy --force-deploy
+```
+
+## Development Workflow Integration
+
+### Local Development Workflow
+1. **Authentication**: Ensure proper authentication with Adobe I/O
+2. **Configuration**: Verify org, project, and workspace selection
+3. **Development Server**: Start local development server for testing
+4. **Action Testing**: Test individual actions with various parameters
+5. **Log Monitoring**: Monitor real-time logs for debugging
+
+### Deployment Workflow
+1. **Code Validation**: Ensure all code meets quality standards
+2. **Configuration Check**: Verify all configurations are correct
+3. **Deployment**: Deploy to runtime environment
+4. **Verification**: Verify deployment success and functionality
+5. **Monitoring**: Monitor application performance and logs
+
+### Commerce Integration Workflow
+1. **Provider Setup**: Configure Adobe I/O event providers
+2. **Event Configuration**: Set up event metadata and registrations
+3. **Subscription Setup**: Subscribe to required Commerce events
+4. **Testing**: Test event handling and processing
+5. **Monitoring**: Monitor event processing and error handling
+
+## Tool Capabilities & Features
+
+### Deployment Features
+- **Selective Deployment**: Deploy specific actions or entire applications
+- **Build Control**: Skip build phase or force rebuild options
+- **Asset Management**: Skip deployment of web assets or actions selectively
+- **Force Options**: Force deploy even when no changes detected
+- **Verbose Output**: Enable detailed output for debugging deployment issues
+
+### Development Features
+- **Hot Reload**: Automatic reloading during development
+- **Local Testing**: Test runtime actions before deployment
+- **Parameter Testing**: Test actions with custom parameters and HTTP methods
+- **Action Discovery**: Automatically discover available actions in the project
+- **Real-time Monitoring**: Monitor application performance and logs
+
+### Configuration Features
+- **Multi-tenancy**: Manage multiple organizations, projects, and workspaces
+- **Global Settings**: Manage global configuration settings
+- **Namespace Management**: Configure runtime namespaces for proper tenant isolation
+- **Authentication Flow**: Handle complex OAuth2 authentication flows
+
+### Commerce Integration Features
+- **Event Provider Management**: Configure and manage Adobe I/O event providers
+- **Commerce Events Module**: Integrate with Commerce Events module
+- **Event Registration**: Create and manage event registrations and metadata
+- **Event Subscription**: Subscribe to and manage Commerce event subscriptions
+- **Event Testing**: Test event handling and processing workflows
+
+## Best Practices for Tool Integration
+
+### Authentication Management
+- **Regular Re-authentication**: Periodically re-authenticate to ensure valid tokens
+- **Context Switching**: Use different contexts for different environments (dev, staging, prod)
+- **Token Management**: Monitor token expiration and refresh as needed
+
+### Development Efficiency
+- **Local Testing First**: Always test actions locally before deploying
+- **Incremental Deployment**: Use selective deployment during development
+- **Log Monitoring**: Continuously monitor logs during development and testing
+- **Configuration Validation**: Regularly verify configuration settings
+
+### Commerce Integration
+- **Event Testing**: Thoroughly test event handling before production deployment
+- **Subscription Management**: Carefully manage event subscriptions to avoid unnecessary processing
+- **Provider Configuration**: Ensure proper event provider configuration for reliable event delivery
+- **Monitoring Setup**: Implement comprehensive monitoring for event processing
+
+## Troubleshooting Common Issues
+
+### Authentication Issues
+- **Invalid Tokens**: Re-authenticate if tokens are expired or invalid
+- **Permission Issues**: Verify user has access to required organizations and applications
+- **Context Problems**: Ensure correct context is selected for the target environment
+
+### Deployment Issues
+- **Build Failures**: Check code quality and dependencies
+- **Configuration Errors**: Verify manifest.yaml and app.config.yaml settings
+- **Permission Problems**: Ensure proper deployment permissions in target namespace
+
+### Commerce Integration Issues
+- **Event Subscription Failures**: Verify Commerce instance configuration and permissions
+- **Provider Setup Issues**: Check event provider configuration and Adobe I/O setup
+- **Event Processing Problems**: Monitor logs and verify event handler implementation
+
+This comprehensive tool integration approach ensures efficient development workflow while maintaining security and quality standards throughout the Adobe Commerce extension development process.
