@@ -36,29 +36,88 @@ This will ensure a robust, maintainable deployment. Should I proceed with these 
 
 ## Cleanup Categories & Procedures
 
-### 1. Unused Actions & Event Handlers
+### 1. Comprehensive Actions & Boilerplate Cleanup
 
-**Check for:**
+**Check for in `/actions` directory:**
 - Actions that were created during development but are no longer referenced
 - Event handlers for events that are no longer subscribed to
 - Duplicate or test actions in the `/actions` directory structure
+- Boilerplate example actions from the Integration Starter Kit
+- Debug or development-only actions
+- Unused entity directories (e.g., `/actions/product/` if no product events are handled)
+
+**Check for in `/scripts/onboarding` directory:**
+- Unused event metadata in `config/events.json`
+- Unused event providers in `config/providers.json`
+- Unused entity-to-provider mappings in `config/starter-kit-registrations.json`
+- Test or example configurations that aren't needed for production
+- Boilerplate event templates that don't match actual requirements
+
+**Check for in `/scripts/commerce-event-subscribe` directory:**
+- Unused event subscriptions in `config/commerce-event-subscribe.json`
+- Test event subscriptions that aren't needed for production
+- Boilerplate event configurations from the starter kit
+- Event subscriptions for events that aren't actually implemented
 
 **Cleanup Process:**
 ```javascript
 // Always confirm before cleanup
-"I've identified the following potentially unused actions:
-- /actions/customer/test/debug-handler (appears to be for testing)
-- /actions/order/legacy/old-processor (replaced by new implementation)
+"I've identified the following cleanup opportunities:
 
-Should I remove these unused actions? This will:
-✅ Reduce deployment size
-✅ Eliminate potential security risks
-✅ Simplify maintenance
+🧹 **Actions Directory (/actions/)**
+- /actions/customer/test/debug-handler (development testing only)
+- /actions/order/legacy/old-processor (replaced by new implementation)
+- /actions/product/ (no product events implemented - entire directory unused)
+- /actions/example/ (boilerplate from starter kit)
+
+📋 **Onboarding Scripts (/scripts/onboarding/)**
+- config/events.json: 3 unused event templates for unimplemented events
+- config/providers.json: 1 unused provider configuration
+- config/starter-kit-registrations.json: 2 unused entity mappings
+
+🔔 **Commerce Event Subscriptions (/scripts/commerce-event-subscribe/)**
+- config/commerce-event-subscribe.json: 2 unused event subscriptions
+- Test event configurations that aren't needed for production
+
+Should I remove these unused components? This will:
+✅ Reduce deployment size significantly
+✅ Eliminate potential security risks from unused code
+✅ Simplify maintenance and configuration
+✅ Remove confusing boilerplate code
 
 Confirm removal? (yes/no)"
 ```
 
-### 2. Dependencies & Package Optimization
+### 2. Boilerplate Code Identification & Removal
+
+**Integration Starter Kit Boilerplate to Check:**
+
+**Actions Directory Patterns:**
+- `/actions/example/` - Example actions from starter kit
+- `/actions/*/test/` - Test-only actions
+- `/actions/*/debug/` - Debug-only actions
+- `/actions/*/legacy/` - Replaced or deprecated actions
+- Empty action directories with only placeholder files
+
+**Configuration File Boilerplate:**
+- `scripts/onboarding/config/events.json` - Unused event templates
+- `scripts/onboarding/config/providers.json` - Unused provider configurations
+- `scripts/onboarding/config/starter-kit-registrations.json` - Unused entity mappings
+- `scripts/commerce-event-subscribe/config/commerce-event-subscribe.json` - Unused event subscriptions
+
+**Boilerplate Cleanup Process:**
+```bash
+# Identify unused directories and files
+find actions/ -type d -empty  # Empty directories
+find actions/ -name "*.js" -size -100c  # Very small files (likely placeholders)
+grep -r "TODO\|FIXME\|EXAMPLE" actions/  # Development markers
+
+# Check for boilerplate patterns
+grep -r "example\|sample\|template" actions/  # Boilerplate indicators
+grep -r "test\|debug\|development" actions/  # Development-only code
+```
+
+### 3. Dependencies & Package Optimization
 
 **Review and clean:**
 - Unused npm dependencies in `package.json`
@@ -161,9 +220,18 @@ Before proceeding with `aio app deploy`, verify:
 ```
 ✅ **Code Quality**
   - [ ] No unused actions or handlers
+  - [ ] No boilerplate code from Integration Starter Kit
+  - [ ] All actions serve actual business requirements
   - [ ] Dependencies are optimized and secure
   - [ ] Configuration is production-ready
   - [ ] Logging is appropriate for production
+
+✅ **Boilerplate Cleanup**
+  - [ ] /actions/ directory contains only implemented actions
+  - [ ] /scripts/onboarding/ configs match actual requirements
+  - [ ] /scripts/commerce-event-subscribe/ contains only needed subscriptions
+  - [ ] No example, test, or debug directories remain
+  - [ ] No placeholder or template files in production code
 
 ✅ **Security**
   - [ ] All webhooks have signature validation
@@ -240,6 +308,27 @@ aio app test  # If tests exist
 aio app validate  # Check configuration validity
 ```
 
+**Post-Cleanup Verification Checklist:**
+```
+✅ **Actions Directory Verification**
+- [ ] All remaining actions are referenced in event subscriptions
+- [ ] No empty or placeholder action directories
+- [ ] All action files contain actual implementation code
+- [ ] No development-only actions remain
+
+✅ **Configuration Files Verification**
+- [ ] All events in events.json have corresponding action implementations
+- [ ] All providers in providers.json are actually used
+- [ ] All entity mappings in starter-kit-registrations.json are valid
+- [ ] All event subscriptions in commerce-event-subscribe.json are implemented
+
+✅ **Boilerplate Removal Verification**
+- [ ] No "example" or "sample" directories remain
+- [ ] No TODO/FIXME comments in production code
+- [ ] No development-only configuration settings
+- [ ] All remaining code serves actual business requirements
+```
+
 ## Post-Cleanup Deployment
 
 ### Optimized Deployment Process
@@ -279,6 +368,10 @@ Your App Builder integration is functionally complete. Before production deploym
 
 ### 📋 **Cleanup Checklist**
 - [ ] **Remove test/debug actions**: Clean up development-only code
+- [ ] **Remove boilerplate code**: Clean up Integration Starter Kit examples and templates
+- [ ] **Clean up /actions/ directory**: Remove unused actions and empty directories
+- [ ] **Clean up /scripts/onboarding/**: Remove unused event templates and provider configs
+- [ ] **Clean up /scripts/commerce-event-subscribe/**: Remove unused event subscriptions
 - [ ] **Optimize dependencies**: Remove unused packages and update security
 - [ ] **Production configuration**: Review manifest.yml and app.config.yaml
 - [ ] **Event subscription cleanup**: Remove test subscriptions and verify production events
