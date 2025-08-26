@@ -61,6 +61,7 @@ The rules are organized in a modular architecture for better maintainability and
 - Seamless integration with Adobe I/O MCP Server tools
 - Authentication, deployment, and testing workflow automation
 - Commerce-specific integration tools
+- Latest documentation search for up-to-date technical guidance
 
 ## Rule Details
 
@@ -145,6 +146,7 @@ Provides comprehensive MCP tools integration guidance:
 - Development workflow integration patterns
 - Authentication, deployment, and testing tools
 - Commerce-specific integration tools and best practices
+- Documentation search tools for latest technical guidance
 
 ### Scope Guardrails
 **File:** `commerce-scope-guardrails.mdc`
@@ -254,6 +256,9 @@ When available, the rules integrate with Adobe I/O MCP Server tools:
 ### Commerce Integration
 - `aio-onboard` - Configure event providers
 - `aio-commerce-event-subscribe` - Subscribe to events
+
+### Documentation & Research
+- `search-commerce-app-builder-docs` - Search latest Adobe Commerce App Builder documentation
 
 ## Support & Documentation
 

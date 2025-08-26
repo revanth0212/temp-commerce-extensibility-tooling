@@ -111,6 +111,7 @@ When working with Adobe Commerce extension development:
 5. **Use the technical knowledge** from `@app-builder-technical-guide.mdc` for implementation details
 6. **Maintain the expert persona** defined in `@adobe-commerce-basics.mdc`
 7. **Enforce scope boundaries** per `@commerce-scope-guardrails.mdc`
+8. **Search latest documentation** using `search-commerce-app-builder-docs` for up-to-date technical guidance
 
 ## Key Principles
 
@@ -120,6 +121,7 @@ When working with Adobe Commerce extension development:
 - **Starter Kit Compliance:** Always use the Integration Starter Kit structure
 - **Interactive Approach:** Gather requirements before generating code
 - **Documentation Complete:** Provide comprehensive documentation and diagrams
+- **Latest Information:** Use `search-commerce-app-builder-docs` to ensure up-to-date technical guidance
 
 ## MCP Tools Integration
 
@@ -129,6 +131,7 @@ When available, prefer using integrated MCP tools for seamless development workf
 - `aio-app-deploy` for deployment to Runtime
 - `aio-dev-invoke` for testing actions locally
 - `aio-configure-global` for workspace configuration
+- `search-commerce-app-builder-docs` for latest documentation and technical guidance
 
 ## Cross-Rule Dependencies
 

@@ -70,6 +70,8 @@ Before writing a single line of code, you **must**:
 
 **When gathering requirements** (if file is missing), ask the following clarifying questions if the information is not provided:
 
+**Note:** For any technical questions or when needing latest App Builder information, use `search-commerce-app-builder-docs` to ensure up-to-date guidance.
+
 * **Critical Question #1 (Target Environment):** "Is this extension intended for **Adobe Commerce PaaS**, **SaaS**, or must it be **compatible with both**? This is crucial as it affects API endpoints, authentication, and module deployment."
 * **Critical Question #2 (Triggering Mechanism):** "What specific **Adobe Commerce event(s)** or **webhook(s)** should trigger this extension's logic? Please provide the event name (e.g., sales_order_shipment_save_after, customer_save_after)."
 * **Critical Question #3 (External System Integration):** "If this extension integrates with a third-party system, please provide the following details for the target API:
@@ -128,6 +130,7 @@ Only after the user approves the plan will you proceed to generate the code.
   * `aio-app-deploy` for deployment
   * `aio-dev-invoke` for testing actions locally
   * `aio-configure-global` for workspace configuration
+  * `search-commerce-app-builder-docs` for latest documentation and technical guidance
 
 ### Deployment Request Handler
 

@@ -25,6 +25,9 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 - **`aio-onboard`**: Configure Adobe I/O event providers and Commerce Events module
 - **`aio-commerce-event-subscribe`**: Subscribe to Commerce events for product and customer changes
 
+### Documentation & Research Tools
+- **`search-commerce-app-builder-docs`**: Search Adobe Commerce App Builder Extension documentation for latest guidance and implementation details
+
 ## MCP Tools Usage Guidelines
 
 ### When to Use MCP Tools
@@ -52,6 +55,11 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 #### Phase 4: Commerce Integration
 - Use `aio-onboard` for initial Commerce integration setup
 - Use `aio-commerce-event-subscribe` for Commerce event subscriptions
+
+#### Phase 5: Documentation & Research
+- Use `search-commerce-app-builder-docs` to find latest documentation and implementation guidance
+- Search for specific technical solutions and best practices
+- Get up-to-date information on App Builder features and capabilities
 
 ## MCP Tools Capabilities
 
@@ -81,6 +89,13 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 - Subscribe to Commerce events (product, customer, order operations)
 - Handle Commerce OAuth1 authentication for event subscriptions
 
+### Documentation Features
+- Search Adobe Commerce App Builder Extension documentation
+- Find latest implementation guidance and best practices
+- Get up-to-date technical solutions and code examples
+- Access current App Builder features and capabilities
+- Research specific integration patterns and workflows
+
 ## Tool Integration Best Practices
 
 - **Always offer MCP tools** when available as alternatives to manual CLI commands
@@ -88,3 +103,5 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 - **Prefer MCP tools** for repetitive tasks and workflow automation
 - **Use verbose flags** when debugging issues with MCP tools
 - **Combine tools effectively** for complete development workflows
+- **Search documentation first** when answering technical questions to ensure up-to-date guidance
+- **Use `search-commerce-app-builder-docs`** for any technical implementation questions or when needing latest App Builder or Adobe Commerce information
