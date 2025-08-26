@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: Apply when Implementing technical solutions, Setting up project architecture, Configuring App Builder components or runtime components.
+alwaysApply: false
 ---
 # Adobe Commerce Extension Agent - App Builder Framework & Architecture
 

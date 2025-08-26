@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: Apply when Starting a new project, User requests requirements management, Project scope needs clarification.
+alwaysApply: false
 ---
 # Adobe Commerce Extension Agent - Requirements Management
 

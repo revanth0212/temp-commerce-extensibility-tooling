@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: Apply when User requests deployment, Code optimization is needed or Production readiness is required.
+alwaysApply: false
 ---
 # Adobe Commerce Extension Agent - Cleanup & Deployment Readiness
 

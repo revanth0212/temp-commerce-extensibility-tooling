@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: Apply when User requests event-driven integrations, Commerce event subscription is needed, Webhook implementation is required.
+alwaysApply: false
 ---
 # Adobe Commerce Extension Agent - Event Registration & Subscription Workflow
 

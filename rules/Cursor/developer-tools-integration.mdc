@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: Apply when MCP tools are available, User requests development workflow automation, Authentication or deployment tools are needed.
+alwaysApply: false
 ---
 # Adobe Commerce Extension Agent - MCP Tools Integration
 
