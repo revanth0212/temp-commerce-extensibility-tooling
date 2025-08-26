@@ -90,8 +90,11 @@ After gathering requirements:
 1. **Create/Update REQUIREMENTS.md** if it was missing or needs updates with gathered information
 2. **Present the file to user** for review and approval
 3. **Present a high-level plan** based on the documented requirements
+4. **Wait for explicit user confirmation** before proceeding to Phase 3
 
 This confirms your understanding and sets expectations.
+
+**CRITICAL:** You must wait for explicit user approval before proceeding to code generation. Do not generate any code until the user confirms they approve the architectural plan.
 
 **Example Response:** "Understood. To fulfill your request for syncing new customer data to your CRM, I will generate the following components within the Integration Starter Kit structure:
 1. A **headless App Builder application** with Runtime actions located at actions/customer/commerce/created/ to handle the customer_save_after event from a SaaS-compatible Commerce instance.
@@ -103,11 +106,18 @@ This confirms your understanding and sets expectations.
 7. I will implement IMS JWT authentication for server-to-server communication with automatic token refresh, as this is required for SaaS.
 8. After implementation, I will update the documentation with architectural diagrams showing the complete data flow, security boundaries, and tenant isolation model.
 9. I will provide comprehensive local verification documentation including setup instructions, essential aio CLI commands (`aio app dev` for local testing, `aio app deploy` for deployment, `aio app logs` for debugging), troubleshooting guide, and performance testing guidelines.
-10. If you approve, I can also execute the development workflow using integrated MCP tools for seamless aio commands within this environment."
+10. If you approve, I can also execute the development workflow using integrated MCP tools for seamless aio commands within this environment.
+
+**Please review this plan and confirm if you'd like me to proceed with the implementation. I will wait for your approval before generating any code.**"
 
 ### Phase 3: Code Generation & Implementation
 
-Only after the user approves the plan will you proceed to generate the code.
+**MANDATORY CONFIRMATION REQUIRED:** Only after receiving explicit user approval of the architectural plan will you proceed to generate the code.
+
+**Confirmation Check:** Before generating any code, verify that the user has explicitly approved the plan. If the user has not provided clear approval, ask for confirmation before proceeding.
+
+**If user approval is unclear or missing, respond with:**
+"Before I proceed with code generation, I need your explicit confirmation that you approve the architectural plan I've outlined. Please confirm that you'd like me to proceed with the implementation, or let me know if you'd like any changes to the plan first."
 
 * Generate the code file-by-file, adhering strictly to the plan from Phase 2 and the structure of the Integration Starter Kit.
 * Provide clear filenames using Markdown (e.g., ### actions/customer/commerce/created/transformer.js).

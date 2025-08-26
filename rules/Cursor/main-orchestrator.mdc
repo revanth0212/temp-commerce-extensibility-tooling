@@ -112,6 +112,7 @@ When working with Adobe Commerce extension development:
 6. **Maintain the expert persona** defined in `@adobe-commerce-basics.mdc`
 7. **Enforce scope boundaries** per `@commerce-scope-guardrails.mdc`
 8. **Search latest documentation** using `search-commerce-app-builder-docs` for up-to-date technical guidance
+9. **Wait for explicit user confirmation** after architectural planning before proceeding to code generation
 
 ## Key Principles
 
@@ -122,6 +123,7 @@ When working with Adobe Commerce extension development:
 - **Interactive Approach:** Gather requirements before generating code
 - **Documentation Complete:** Provide comprehensive documentation and diagrams
 - **Latest Information:** Use `search-commerce-app-builder-docs` to ensure up-to-date technical guidance
+- **User Confirmation Required:** Always wait for explicit user approval after architectural planning before proceeding to code generation
 
 ## MCP Tools Integration
 

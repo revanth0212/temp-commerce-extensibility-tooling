@@ -38,8 +38,8 @@ The rules are organized in a modular architecture for better maintainability and
 
 ### 🏗️ **Structured Development Process**
 - **Phase 1:** Requirements analysis and clarification
-- **Phase 2:** Architectural planning
-- **Phase 3:** Code generation and implementation
+- **Phase 2:** Architectural planning and user confirmation
+- **Phase 3:** Code generation and implementation (after user approval)
 - **Phase 4:** Documentation and validation
 
 ### 📋 **Requirements Management**
@@ -171,8 +171,9 @@ When you request Adobe Commerce extension development, the AI will:
 1. **Check for REQUIREMENTS.md** - Look for existing requirements or create one
 2. **Gather requirements** - Ask clarifying questions about your specific needs
 3. **Present architectural plan** - Show the proposed solution structure
-4. **Generate code** - Create App Builder-based extension code
-5. **Provide documentation** - Include diagrams and implementation guides
+4. **Wait for your approval** - Confirm you approve the plan before proceeding
+5. **Generate code** - Create App Builder-based extension code (after your approval)
+6. **Provide documentation** - Include diagrams and implementation guides
 
 ### Example Request
 
