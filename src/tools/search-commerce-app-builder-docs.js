@@ -71,7 +71,8 @@ export default async function searchCommerceAppBuilderDocs(args) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const results = await response.json();
+    const payload = await response.json(); // payload will be in the format of the sample.json file
+    const results = payload.results; 
 
     console.error(`✅ Found ${results.length} relevant documentation sections`);
 
@@ -80,10 +81,8 @@ export default async function searchCommerceAppBuilderDocs(args) {
       rank: index + 1,
       source: doc.metadata?.source || "Unknown",
       content: doc.pageContent,
-      contentPreview:
-        doc.pageContent.substring(0, 200) +
-        (doc.pageContent.length > 200 ? "..." : ""),
       metadata: doc.metadata,
+      relevanceScore: doc.relevanceScore,
     }));
 
     const result = {
