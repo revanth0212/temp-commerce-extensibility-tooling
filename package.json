@@ -1,6 +1,6 @@
 {
   "name": "temp-commerce-extensibility-tooling",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "MCP server providing Temp Commerce Extensibility Tooling for deployment and management",
   "main": "index.js",
   "type": "module",
@@ -23,7 +23,8 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.4.0",
     "dotenv": "^16.3.1",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "zod": "^3.22.4"
   },
   "engines": {
     "node": ">=18.0.0"
