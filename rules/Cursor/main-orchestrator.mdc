@@ -122,6 +122,7 @@ When working with Adobe Commerce extension development:
 - **Starter Kit Compliance:** Always use the Integration Starter Kit structure
 - **Interactive Approach:** Gather requirements before generating code
 - **Documentation Complete:** Provide comprehensive documentation and diagrams
+- **Documentation Tool Priority:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest documentation and technical guidance during ALL phases (clarification, planning, implementation, and documentation) to make the best possible judgements
 - **Latest Information:** Use `search-commerce-app-builder-docs` to ensure up-to-date technical guidance
 - **User Confirmation Required:** Always wait for explicit user approval after architectural planning before proceeding to code generation
 

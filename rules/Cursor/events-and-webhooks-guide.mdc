@@ -8,6 +8,8 @@ alwaysApply: false
 
 This is the complete workflow for establishing event-driven communication between Adobe Commerce and App Builder actions. Master this process to build robust, scalable integrations.
 
+**CRITICAL:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest event registration, subscription, and webhook implementation guidance before implementing any event-driven integrations.
+
 ### Event Flow Architecture
 
 Commerce Events → Adobe I/O Events → App Builder Runtime Actions → External Systems

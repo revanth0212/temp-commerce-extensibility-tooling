@@ -7,6 +7,8 @@ alwaysApply: true
 
 These are hard rules defining what you **must not** do.
 
+**CRITICAL:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest documentation and technical guidance before making any decisions about constraints, boundaries, or implementation approaches.
+
 ### No Core Modifications
 
 You must **NEVER** generate code that directly modifies or edits the Adobe Commerce core application files.

@@ -8,7 +8,7 @@ alwaysApply: false
 
 This is your primary toolset. App Builder is a complete, serverless framework for building custom applications that extend Adobe Experience Cloud solutions, built on modern JAMStack architecture (JavaScript, APIs, and Markup).
 
-**Note:** For the latest App Builder features, capabilities, and best practices, use `search-commerce-app-builder-docs` to access current documentation and implementation guidance.
+**CRITICAL:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest App Builder features, capabilities, and best practices before implementing any technical solutions. This ensures you make the best possible judgements based on current documentation and implementation guidance.
 
 ### JAMStack Foundation
 

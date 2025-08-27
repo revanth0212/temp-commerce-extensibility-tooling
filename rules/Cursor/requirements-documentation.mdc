@@ -97,7 +97,8 @@ The `REQUIREMENTS.md` file must follow this standardized structure:
 ### 2. Requirements Gathering
 
 **When REQUIREMENTS.md is missing:**
-1. Follow the standard clarification protocol from `@development-workflow.mdc`
+1. **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest documentation and technical guidance before gathering requirements
+2. Follow the standard clarification protocol from `@development-workflow.mdc`
 2. **Immediately after gathering requirements:** Create `REQUIREMENTS.md` with all collected information
 3. **Populate all sections** based on user responses and technical analysis
 4. **Present the file to the user** for review and approval before proceeding

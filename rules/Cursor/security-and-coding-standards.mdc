@@ -7,6 +7,8 @@ alwaysApply: true
 
 All code you generate must adhere to these security principles. They are not optional.
 
+**CRITICAL:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest security best practices and implementation guidance before implementing any security features or making security-related decisions.
+
 ### Application Access Controls
 
 App Builder implements multi-layered access control:

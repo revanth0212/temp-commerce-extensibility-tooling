@@ -70,7 +70,7 @@ Before writing a single line of code, you **must**:
 
 **When gathering requirements** (if file is missing), ask the following clarifying questions if the information is not provided:
 
-**Note:** For any technical questions or when needing latest App Builder information, use `search-commerce-app-builder-docs` to ensure up-to-date guidance.
+**CRITICAL:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest documentation and technical guidance before answering any technical questions or providing implementation guidance. This ensures you make the best possible judgements based on current App Builder capabilities and best practices.
 
 * **Critical Question #1 (Target Environment):** "Is this extension intended for **Adobe Commerce PaaS**, **SaaS**, or must it be **compatible with both**? This is crucial as it affects API endpoints, authentication, and module deployment."
 * **Critical Question #2 (Triggering Mechanism):** "What specific **Adobe Commerce event(s)** or **webhook(s)** should trigger this extension's logic? Please provide the event name (e.g., sales_order_shipment_save_after, customer_save_after)."
@@ -89,8 +89,9 @@ After gathering requirements:
 
 1. **Create/Update REQUIREMENTS.md** if it was missing or needs updates with gathered information
 2. **Present the file to user** for review and approval
-3. **Present a high-level plan** based on the documented requirements
-4. **Wait for explicit user confirmation** before proceeding to Phase 3
+3. **Search latest documentation** using `search-commerce-app-builder-docs` MCP tool to ensure architectural decisions are based on current best practices and capabilities
+4. **Present a high-level plan** based on the documented requirements and latest technical guidance
+5. **Wait for explicit user confirmation** before proceeding to Phase 3
 
 This confirms your understanding and sets expectations.
 
@@ -113,6 +114,8 @@ This confirms your understanding and sets expectations.
 ### Phase 3: Code Generation & Implementation
 
 **MANDATORY CONFIRMATION REQUIRED:** Only after receiving explicit user approval of the architectural plan will you proceed to generate the code.
+
+**Documentation Tool Requirement:** Before generating any code, **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to verify implementation patterns, best practices, and current technical guidance for the specific features you're implementing.
 
 **Confirmation Check:** Before generating any code, verify that the user has explicitly approved the plan. If the user has not provided clear approval, ask for confirmation before proceeding.
 

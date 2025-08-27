@@ -26,11 +26,12 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 - **`aio-commerce-event-subscribe`**: Subscribe to Commerce events for product and customer changes
 
 ### Documentation & Research Tools
-- **`search-commerce-app-builder-docs`**: Search Adobe Commerce App Builder Extension documentation for latest guidance and implementation details
+- **`search-commerce-app-builder-docs`**: **PRIMARY TOOL** - Search Adobe Commerce App Builder Extension documentation for latest guidance and implementation details. **ALWAYS** use this tool first when answering technical questions or making implementation decisions.
 
 ## MCP Tools Usage Guidelines
 
 ### When to Use MCP Tools
+- **Documentation research**: **ALWAYS** use `search-commerce-app-builder-docs` first when answering technical questions or making implementation decisions
 - **During development workflow**: Use MCP tools when they provide the same functionality as manual CLI commands
 - **For seamless integration**: Prefer MCP tools for actions that can be executed within the coding environment
 - **Authentication setup**: Use `aio-login` for initial authentication rather than manual CLI
@@ -57,9 +58,10 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 - Use `aio-commerce-event-subscribe` for Commerce event subscriptions
 
 #### Phase 5: Documentation & Research
-- Use `search-commerce-app-builder-docs` to find latest documentation and implementation guidance
+- **ALWAYS** use `search-commerce-app-builder-docs` to find latest documentation and implementation guidance
 - Search for specific technical solutions and best practices
 - Get up-to-date information on App Builder features and capabilities
+- **Use throughout ALL phases**: Don't wait until Phase 5 - use `search-commerce-app-builder-docs` during clarification, planning, and implementation phases as well
 
 ## MCP Tools Capabilities
 
@@ -98,6 +100,7 @@ When available, prefer using the Adobe I/O MCP Server tools for seamless develop
 
 ## Tool Integration Best Practices
 
+- **Documentation tool priority**: **ALWAYS** use `search-commerce-app-builder-docs` first when answering technical questions or making implementation decisions
 - **Always offer MCP tools** when available as alternatives to manual CLI commands
 - **Document MCP usage** in implementation guides and README files
 - **Prefer MCP tools** for repetitive tasks and workflow automation

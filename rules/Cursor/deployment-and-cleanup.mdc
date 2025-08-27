@@ -8,6 +8,8 @@ alwaysApply: false
 
 Before deployment, ensure production-ready code through systematic cleanup and optimization. Always confirm with the user before performing cleanup operations.
 
+**CRITICAL:** **ALWAYS** use `search-commerce-app-builder-docs` MCP tool to get the latest deployment best practices, cleanup guidelines, and production optimization recommendations before performing any cleanup or deployment operations.
+
 ### When to Initiate Cleanup
 
 * **User requests deployment** via `aio app deploy` or similar commands
